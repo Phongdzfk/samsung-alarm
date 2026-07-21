@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:background="@drawable/bg_app">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="64dp" android:gravity="center_vertical" android:paddingHorizontal="12dp">
+        <ImageButton android:id="@+id/backButton" android:layout_width="48dp" android:layout_height="48dp" android:background="?attr/selectableItemBackgroundBorderless" android:contentDescription="@string/back" android:src="@drawable/ic_back" app:tint="@color/navy" />
+        <TextView android:id="@+id/editTitle" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/add_alarm" android:textColor="@color/navy" android:textSize="22sp" android:textStyle="bold" />
+        <TextView android:id="@+id/saveButton" android:layout_width="wrap_content" android:layout_height="48dp" android:gravity="center" android:paddingHorizontal="12dp" android:text="@string/save" android:textColor="@color/primary" android:textStyle="bold" />
+    </LinearLayout>
+    <ScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="18dp">
+            <TimePicker android:id="@+id/timePicker" android:layout_width="match_parent" android:layout_height="wrap_content" android:timePickerMode="spinner" />
+            <com.google.android.material.textfield.TextInputLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:hint="@string/alarm_label">
+                <com.google.android.material.textfield.TextInputEditText android:id="@+id/labelInput" android:layout_width="match_parent" android:layout_height="wrap_content" android:maxLength="40" android:singleLine="true" />
+            </com.google.android.material.textfield.TextInputLayout>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="22dp" android:text="@string/repeat" android:textColor="@color/navy" android:textSize="17sp" android:textStyle="bold" />
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:orientation="horizontal">
+                <CheckBox android:id="@+id/dayMon" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:button="@null" android:gravity="center" android:padding="9dp" android:text="@string/day_mon" />
+                <CheckBox android:id="@+id/dayTue" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:button="@null" android:gravity="center" android:padding="9dp" android:text="@string/day_tue" />
+                <CheckBox android:id="@+id/dayWed" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:button="@null" android:gravity="center" android:padding="9dp" android:text="@string/day_wed" />
+                <CheckBox android:id="@+id/dayThu" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:button="@null" android:gravity="center" android:padding="9dp" android:text="@string/day_thu" />
+                <CheckBox android:id="@+id/dayFri" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:button="@null" android:gravity="center" android:padding="9dp" android:text="@string/day_fri" />
+                <CheckBox android:id="@+id/daySat" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:button="@null" android:gravity="center" android:padding="9dp" android:text="@string/day_sat" />
+                <CheckBox android:id="@+id/daySun" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:button="@null" android:gravity="center" android:padding="9dp" android:text="@string/day_sun" />
+            </LinearLayout>
+            <com.google.android.material.button.MaterialButton android:id="@+id/ringtoneButton" style="@style/Widget.Material3.Button.TonalButton" android:layout_width="match_parent" android:layout_height="56dp" android:layout_marginTop="18dp" android:text="@string/ringtone_default" />
+            <TextView android:id="@+id/volumeLabel" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:text="@string/volume_default" android:textColor="@color/navy" android:textStyle="bold" />
+            <SeekBar android:id="@+id/volumeSeek" android:layout_width="match_parent" android:layout_height="wrap_content" android:max="100" android:progress="80" />
+            <com.google.android.material.materialswitch.MaterialSwitch android:id="@+id/mathSwitch" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="@string/math_dismiss" />
+            <Spinner android:id="@+id/difficultySpinner" android:layout_width="match_parent" android:layout_height="52dp" android:visibility="gone" />
+            <com.google.android.material.materialswitch.MaterialSwitch android:id="@+id/keepSwitch" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/keep_one_time" />
+            <com.google.android.material.materialswitch.MaterialSwitch android:id="@+id/gradualSwitch" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/gradual_volume" />
+            <com.google.android.material.materialswitch.MaterialSwitch android:id="@+id/vibrateSwitch" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/vibrate" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="14dp" android:text="@string/auto_action_title" android:textColor="@color/navy" android:textStyle="bold" />
+            <Spinner android:id="@+id/autoActionSpinner" android:layout_width="match_parent" android:layout_height="52dp" />
+            <TextView android:id="@+id/autoAfterLabel" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/after_5_minutes" android:textColor="@color/slate" />
+            <SeekBar android:id="@+id/autoAfterSeek" android:layout_width="match_parent" android:layout_height="wrap_content" android:max="29" android:progress="4" />
+            <TextView android:id="@+id/snoozeLabel" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="@string/snooze_5_minutes" android:textColor="@color/navy" android:textStyle="bold" />
+            <SeekBar android:id="@+id/snoozeSeek" android:layout_width="match_parent" android:layout_height="wrap_content" android:max="29" android:progress="4" />
+            <Space android:layout_width="1dp" android:layout_height="30dp" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

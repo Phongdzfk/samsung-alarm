@@ -1,0 +1,4 @@
+<resources>
+    <color name="navy">#F1F5F9</color><color name="slate">#A8B3C4</color><color name="surface">#0F1117</color><color name="card">#1A1D26</color>
+    <color name="primary">#CBB5FF</color><color name="primary_dark">#D9C7FF</color><color name="primary_soft">#332A48</color><color name="success">#72D58B</color><color name="danger">#FF8A80</color>
+</resources>

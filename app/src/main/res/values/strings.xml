@@ -1,0 +1,86 @@
+<resources>
+    <string name="app_name">Smart Alarm</string>
+    <string name="channel_alarm">Báo thức đang reo</string>
+    <string name="channel_alarm_description">Chuông và màn hình báo thức</string>
+    <string name="channel_upcoming">Báo thức sắp tới</string>
+    <string name="channel_upcoming_description">Nhắc trước 30 phút</string>
+    <string name="alarm">Báo thức</string>
+    <string name="quick_alarm">Báo thức nhanh</string>
+    <string name="timer">Hẹn giờ</string>
+    <string name="stopwatch">Bấm giờ</string>
+    <string name="alarm_subtitle">Bắt đầu ngày mới theo cách của bạn</string>
+    <string name="quick_subtitle">Một chạm, sẵn sàng đúng giờ</string>
+    <string name="timer_subtitle">Tập trung vào khoảnh khắc hiện tại</string>
+    <string name="stopwatch_subtitle">Đo chính xác từng khoảnh khắc</string>
+    <string name="no_upcoming">Không có báo thức sắp tới</string>
+    <string name="upcoming_format">Tiếp theo  ·  %1$s  ·  %2$s</string>
+    <string name="empty_alarms">⏰\nChưa có báo thức\nNhấn + để tạo báo thức đầu tiên</string>
+    <string name="quick_description">Chọn khoảng thời gian, chuông sẽ reo ngay khi hết giờ.</string>
+    <string name="minutes_format">%1$d phút</string>
+    <string name="minutes_5">5 phút</string><string name="minutes_10">10 phút</string><string name="minutes_15">15 phút</string><string name="minutes_30">30 phút</string>
+    <string name="custom_minutes">Số phút tùy chọn</string>
+    <string name="set_quick_alarm">Đặt báo thức nhanh</string>
+    <string name="timer_range">Kéo để chọn 1–120 phút</string>
+    <string name="reset">Đặt lại</string>
+    <string name="start">Bắt đầu</string>
+    <string name="pause">Tạm dừng</string>
+    <string name="resume">Tiếp tục</string>
+    <string name="add_alarm">Thêm báo thức</string>
+    <string name="nav_alarm">⏰\nBáo thức</string>
+    <string name="nav_quick">⚡\nNhanh</string>
+    <string name="nav_timer">⌛\nHẹn giờ</string>
+    <string name="nav_stopwatch">⏱\nBấm giờ</string>
+    <string name="enter_minutes">Hãy nhập số phút hợp lệ</string>
+    <string name="quick_scheduled">Sẽ báo sau %1$d phút</string>
+    <string name="exact_alarm_permission">Cần quyền đặt báo thức chính xác</string>
+    <string name="delete_alarm_title">Xóa báo thức?</string>
+    <string name="cancel">Hủy</string>
+    <string name="delete">Xóa</string>
+    <string name="delete_alarm_message">%1$02d:%2$02d · %3$s</string>
+    <string name="one_time">Một lần</string>
+    <string name="every_day">Mỗi ngày</string>
+    <string name="weekdays_short">T2  T3  T4  T5  T6</string>
+    <string name="day_mon">T2</string><string name="day_tue">T3</string><string name="day_wed">T4</string><string name="day_thu">T5</string><string name="day_fri">T6</string><string name="day_sat">T7</string><string name="day_sun">CN</string>
+    <string name="skip_next">Bỏ qua lần tới</string>
+    <string name="undo_skip">Hủy bỏ qua</string>
+    <string name="skipped_badge">Đã bỏ qua lần tới</string>
+    <string name="back">Quay lại</string>
+    <string name="edit_alarm">Sửa báo thức</string>
+    <string name="save">LƯU</string>
+    <string name="alarm_label">Nhãn báo thức</string>
+    <string name="repeat">Lặp lại</string>
+    <string name="ringtone_default">Âm báo: Mặc định</string>
+    <string name="ringtone_selected">Đã chọn</string>
+    <string name="ringtone_format">Âm báo: %1$s</string>
+    <string name="volume_format">Âm lượng: %1$d%%</string>
+    <string name="volume_default">Âm lượng: 80%</string><string name="after_5_minutes">Sau 5 phút</string><string name="snooze_5_minutes">Thời gian hoãn: 5 phút</string><string name="snooze_5">Hoãn 5 phút</string>
+    <string name="math_dismiss">Giải toán để tắt báo thức</string>
+    <string name="keep_one_time">Giữ báo thức một lần sau khi tắt</string>
+    <string name="gradual_volume">Tăng âm lượng dần trong 60 giây</string>
+    <string name="vibrate">Rung khi báo thức reo</string>
+    <string name="auto_action_title">Tự động xử lý nếu không phản hồi</string>
+    <string name="after_minutes">Sau %1$d phút</string>
+    <string name="snooze_duration">Thời gian hoãn: %1$d phút</string>
+    <string-array name="math_difficulties"><item>Dễ: cộng/trừ</item><item>Vừa: nhân</item><item>Khó: hai phép tính</item></string-array>
+    <string-array name="auto_actions"><item>Không tự động</item><item>Tự động hoãn</item><item>Tự động tắt</item></string-array>
+    <string name="alarm_saved">Đã lưu báo thức</string>
+    <string name="solve_to_dismiss">Giải để tắt báo thức</string>
+    <string name="enter_answer">Nhập đáp án</string>
+    <string name="wrong_answer">Chưa đúng, hãy thử lại</string>
+    <string name="math_add">%1$d + %2$d = ?</string><string name="math_subtract">%1$d − %2$d = ?</string><string name="math_multiply">%1$d × %2$d = ?</string><string name="math_hard">%1$d + %2$d × %3$d = ?</string>
+    <string name="timer_initial" translatable="false">05:00</string><string name="stopwatch_zero" translatable="false">00:00.00</string><string name="time_preview" translatable="false">07:30</string><string name="math_preview" translatable="false">12 + 8 = ?</string>
+    <string name="snooze_button">Hoãn %1$d phút</string>
+    <string name="dismiss_alarm">Tắt báo thức</string>
+    <string name="ringing_title">Đang báo thức</string>
+    <string name="snooze">Hoãn</string>
+    <string name="dismiss">Tắt</string>
+    <string name="upcoming_notification_title">Báo thức sau 30 phút</string>
+    <string name="timer_finished">Hẹn giờ hoàn tất</string>
+    <string name="settings">Cài đặt</string>
+    <string name="appearance_language">Giao diện &amp; ngôn ngữ</string>
+    <string name="theme">Chế độ hiển thị</string>
+    <string-array name="theme_options"><item>Theo hệ thống</item><item>Sáng</item><item>Tối</item></string-array>
+    <string name="language">Ngôn ngữ</string>
+    <string-array name="language_options"><item>Tiếng Việt</item><item>English</item></string-array>
+    <string name="done">Xong</string>
+</resources>

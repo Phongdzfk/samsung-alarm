@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:background="@drawable/bg_app">
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:gravity="center_vertical" android:paddingStart="20dp" android:paddingTop="16dp"
+        android:paddingEnd="20dp" android:paddingBottom="12dp">
+        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+            <TextView android:id="@+id/title" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="@string/alarm" android:textColor="@color/navy" android:textSize="30sp" android:textStyle="bold" />
+            <TextView android:id="@+id/subtitle" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginTop="3dp" android:text="@string/alarm_subtitle" android:textColor="@color/slate" android:textSize="14sp" />
+        </LinearLayout>
+        <ImageButton android:id="@+id/settingsButton" android:layout_width="48dp" android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless" android:contentDescription="@string/settings"
+            android:src="@drawable/ic_settings" app:tint="@color/slate" />
+    </LinearLayout>
+
+    <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <LinearLayout android:id="@+id/paneAlarms" android:layout_width="match_parent" android:layout_height="match_parent"
+            android:orientation="vertical" android:paddingHorizontal="16dp">
+            <TextView android:id="@+id/upcomingText" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:background="@drawable/bg_card" android:text="@string/no_upcoming"
+                android:textColor="@color/primary_dark" android:textStyle="bold" android:layout_marginBottom="10dp" />
+            <androidx.recyclerview.widget.RecyclerView android:id="@+id/alarmList"
+                android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
+                android:clipToPadding="false" android:paddingBottom="88dp" />
+            <TextView android:id="@+id/emptyText" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_gravity="center" android:gravity="center" android:text="@string/empty_alarms"
+                android:textColor="@color/slate" android:textSize="17sp" android:visibility="gone" />
+        </LinearLayout>
+
+        <ScrollView android:id="@+id/paneQuick" android:layout_width="match_parent" android:layout_height="match_parent" android:visibility="gone">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="20dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/quick_alarm"
+                    android:textColor="@color/navy" android:textSize="22sp" android:textStyle="bold" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp"
+                    android:text="@string/quick_description" android:textColor="@color/slate" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/quick5" style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="match_parent" android:layout_height="64dp" android:layout_marginTop="24dp" android:text="@string/minutes_5" android:textSize="18sp" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/quick10" style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="match_parent" android:layout_height="64dp" android:layout_marginTop="10dp" android:text="@string/minutes_10" android:textSize="18sp" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/quick15" style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="match_parent" android:layout_height="64dp" android:layout_marginTop="10dp" android:text="@string/minutes_15" android:textSize="18sp" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/quick30" style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="match_parent" android:layout_height="64dp" android:layout_marginTop="10dp" android:text="@string/minutes_30" android:textSize="18sp" />
+                <com.google.android.material.textfield.TextInputLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginTop="18dp" android:hint="@string/custom_minutes">
+                    <com.google.android.material.textfield.TextInputEditText android:id="@+id/quickCustom"
+                        android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="number" />
+                </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.button.MaterialButton android:id="@+id/quickStart"
+                    android:layout_width="match_parent" android:layout_height="56dp" android:layout_marginTop="8dp" android:text="@string/set_quick_alarm" />
+            </LinearLayout>
+        </ScrollView>
+
+        <LinearLayout android:id="@+id/paneTimer" android:layout_width="match_parent" android:layout_height="match_parent"
+            android:visibility="gone" android:orientation="vertical" android:gravity="center_horizontal" android:padding="24dp">
+            <TextView android:id="@+id/timerDisplay" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginTop="50dp" android:text="@string/timer_initial" android:textColor="@color/navy" android:textSize="64sp" android:textStyle="bold" />
+            <SeekBar android:id="@+id/timerSeek" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="28dp" android:max="120" android:progress="5" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/timer_range" android:textColor="@color/slate" />
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:layout_marginTop="28dp">
+                <com.google.android.material.button.MaterialButton android:id="@+id/timerReset" style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="120dp" android:layout_height="56dp" android:text="@string/reset" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/timerStart"
+                    android:layout_width="120dp" android:layout_height="56dp" android:layout_marginStart="12dp" android:text="@string/start" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/paneStopwatch" android:layout_width="match_parent" android:layout_height="match_parent"
+            android:visibility="gone" android:orientation="vertical" android:gravity="center_horizontal" android:padding="24dp">
+            <TextView android:id="@+id/stopwatchDisplay" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginTop="60dp" android:text="@string/stopwatch_zero" android:textColor="@color/navy" android:textSize="54sp" android:textStyle="bold" />
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:layout_marginTop="40dp">
+                <com.google.android.material.button.MaterialButton android:id="@+id/stopwatchReset" style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="120dp" android:layout_height="56dp" android:text="@string/reset" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/stopwatchStart"
+                    android:layout_width="120dp" android:layout_height="56dp" android:layout_marginStart="12dp" android:text="@string/start" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton android:id="@+id/addAlarm"
+            android:layout_width="64dp" android:layout_height="64dp" android:layout_gravity="bottom|end"
+            android:layout_margin="22dp" android:contentDescription="@string/add_alarm" android:src="@drawable/ic_add"
+            app:backgroundTint="@color/primary" app:tint="@color/white" />
+    </FrameLayout>
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="70dp" android:background="@color/card"
+        android:gravity="center" android:orientation="horizontal" android:paddingHorizontal="8dp">
+        <Button android:id="@+id/navAlarm" style="@style/Widget.Material3.Button.TextButton" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:text="@string/nav_alarm" android:textAllCaps="false" />
+        <Button android:id="@+id/navQuick" style="@style/Widget.Material3.Button.TextButton" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:text="@string/nav_quick" android:textAllCaps="false" />
+        <Button android:id="@+id/navTimer" style="@style/Widget.Material3.Button.TextButton" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:text="@string/nav_timer" android:textAllCaps="false" />
+        <Button android:id="@+id/navStopwatch" style="@style/Widget.Material3.Button.TextButton" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:text="@string/nav_stopwatch" android:textAllCaps="false" />
+    </LinearLayout>
+</LinearLayout>
