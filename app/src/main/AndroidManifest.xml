@@ -40,9 +40,9 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".alarm.AlarmReceiver" android:exported="false" />
-        <receiver android:name=".alarm.UpcomingReceiver" android:exported="false" />
-        <receiver android:name=".alarm.BootReceiver" android:exported="true">
+        <receiver android:name=".service.AlarmReceiver" android:exported="false" />
+        <receiver android:name=".service.UpcomingReceiver" android:exported="false" />
+        <receiver android:name=".service.BootReceiver" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.TIME_SET" />
@@ -50,7 +50,7 @@
             </intent-filter>
         </receiver>
         <service
-            android:name=".alarm.AlarmRingingService"
+            android:name=".service.AlarmRingingService"
             android:exported="false"
             android:foregroundServiceType="mediaPlayback" />
     </application>

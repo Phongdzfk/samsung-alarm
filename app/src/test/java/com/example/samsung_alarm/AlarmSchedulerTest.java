@@ -1,7 +1,7 @@
 package com.example.samsung_alarm;
 
 import static org.junit.Assert.assertTrue;
-import com.example.samsung_alarm.alarm.AlarmScheduler;
+import com.example.samsung_alarm.service.AlarmScheduler;
 import com.example.samsung_alarm.data.model.Alarm;
 import org.junit.Test;
 import java.util.Calendar;

@@ -1,7 +1,7 @@
 package com.example.samsung_alarm;
 
 import android.app.Application;
-import com.example.samsung_alarm.alarm.NotificationHelper;
+import com.example.samsung_alarm.service.NotificationHelper;
 import com.example.samsung_alarm.settings.AppPreferences;
 
 /** Application-level initialization for locale, theme and notification channels. */

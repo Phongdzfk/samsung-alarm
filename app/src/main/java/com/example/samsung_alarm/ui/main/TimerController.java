@@ -6,7 +6,7 @@ import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import com.example.samsung_alarm.R;
-import com.example.samsung_alarm.alarm.AlarmScheduler;
+import com.example.samsung_alarm.service.AlarmScheduler;
 import com.example.samsung_alarm.ui.common.SimpleSeekBarListener;
 import java.util.Locale;
 

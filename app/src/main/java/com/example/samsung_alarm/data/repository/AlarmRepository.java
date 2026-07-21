@@ -2,7 +2,7 @@ package com.example.samsung_alarm.data.repository;
 
 import android.content.Context;
 import androidx.lifecycle.LiveData;
-import com.example.samsung_alarm.alarm.AlarmScheduler;
+import com.example.samsung_alarm.service.AlarmScheduler;
 import com.example.samsung_alarm.data.AppExecutors;
 import com.example.samsung_alarm.data.database.AlarmDao;
 import com.example.samsung_alarm.data.database.AppDatabase;

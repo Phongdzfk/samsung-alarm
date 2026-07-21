@@ -21,7 +21,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.samsung_alarm.R;
-import com.example.samsung_alarm.alarm.AlarmScheduler;
+import com.example.samsung_alarm.service.AlarmScheduler;
 import com.example.samsung_alarm.data.model.Alarm;
 import com.example.samsung_alarm.data.repository.AlarmRepository;
 import com.example.samsung_alarm.settings.AppPreferences;

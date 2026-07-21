@@ -1,4 +1,4 @@
-package com.example.samsung_alarm.alarm;
+package com.example.samsung_alarm.service;
 
 import android.app.Notification;
 import android.app.PendingIntent;
