@@ -14,7 +14,7 @@
     <string name="stopwatch_subtitle">Đo chính xác từng khoảnh khắc</string>
     <string name="no_upcoming">Không có báo thức sắp tới</string>
     <string name="upcoming_format">Tiếp theo  ·  %1$s  ·  %2$s</string>
-    <string name="empty_alarms">⏰\nChưa có báo thức\nNhấn + để tạo báo thức đầu tiên</string>
+    <string name="empty_alarms">Chưa có báo thức\nNhấn nút thêm để tạo báo thức đầu tiên</string>
     <string name="quick_description">Chọn khoảng thời gian, chuông sẽ reo ngay khi hết giờ.</string>
     <string name="minutes_format">%1$d phút</string>
     <string name="minutes_5">5 phút</string><string name="minutes_10">10 phút</string><string name="minutes_15">15 phút</string><string name="minutes_30">30 phút</string>
@@ -26,12 +26,15 @@
     <string name="pause">Tạm dừng</string>
     <string name="resume">Tiếp tục</string>
     <string name="add_alarm">Thêm báo thức</string>
-    <string name="nav_alarm">⏰\nBáo thức</string>
-    <string name="nav_quick">⚡\nNhanh</string>
-    <string name="nav_timer">⌛\nHẹn giờ</string>
-    <string name="nav_stopwatch">⏱\nBấm giờ</string>
+    <string name="nav_alarm">Báo thức</string>
+    <string name="nav_quick">Nhanh</string>
+    <string name="nav_timer">Hẹn giờ</string>
+    <string name="nav_stopwatch">Bấm giờ</string>
     <string name="enter_minutes">Hãy nhập số phút hợp lệ</string>
     <string name="quick_scheduled">Sẽ báo sau %1$d phút</string>
+    <string name="active_quick_alarms">Báo thức nhanh đang chờ</string>
+    <string name="quick_alarm_detail">%1$s · còn khoảng %2$d phút</string>
+    <string name="quick_alarm_preview">08:30 · còn khoảng 10 phút</string>
     <string name="exact_alarm_permission">Cần quyền đặt báo thức chính xác</string>
     <string name="delete_alarm_title">Xóa báo thức?</string>
     <string name="cancel">Hủy</string>
@@ -83,4 +86,21 @@
     <string name="language">Ngôn ngữ</string>
     <string-array name="language_options"><item>Tiếng Việt</item><item>English</item></string-array>
     <string name="done">Xong</string>
+    <string name="no_quick_alarms">Chưa có báo thức nhanh</string>
+    <string name="delete_quick_alarm_title">Xóa báo thức nhanh?</string>
+    <string name="swipe_up_to_dismiss">Vuốt lên để tắt</string>
+    <string name="tap_to_dismiss">Hoặc nhấn để tắt</string>
+    <string name="solve_before_dismiss">Hãy giải đúng bài toán trước khi tắt</string>
+    <string name="choose_alarm_sound">Chọn âm báo</string>
+    <string name="ringtone_selected_default">Âm báo mặc định</string>
+    <string name="check_answer">Kiểm tra đáp án</string>
+    <string name="full_screen_permission_title">Cho phép báo thức toàn màn hình</string>
+    <string name="full_screen_permission_message">Quyền này cần thiết để báo thức mở toàn màn hình khi máy khóa hoặc đang ở màn hình Home.</string>
+    <string name="open_settings">Mở cài đặt</string>
+    <string name="upcoming_persistent_title">Báo thức lúc %1$s</string>
+    <string name="turn_off_alarm">Tắt báo thức</string>
+    <string name="alarm_soon">Sắp reo</string>
+    <string name="alarm_disabled">Đã tắt</string>
+    <string name="alarm_after_minutes">Báo thức sau %1$d phút</string>
+    <string name="alarm_after_hours_minutes">Báo thức sau %1$d giờ %2$d phút</string>
 </resources>

@@ -9,11 +9,18 @@ import android.provider.Settings;
 
 import com.example.samsung_alarm.data.model.Alarm;
 import com.example.samsung_alarm.R;
+import com.example.samsung_alarm.ui.ring.RingActivity;
 import java.util.Calendar;
 
 public final class AlarmScheduler {
     public static final String EXTRA_ALARM_ID = "alarm_id";
     public static final String EXTRA_PREVIEW = "preview";
+    public static final String EXTRA_MATH_DISMISS = "math_dismiss";
+    public static final String EXTRA_MATH_DIFFICULTY = "math_difficulty";
+    public static final String EXTRA_LABEL = "alarm_label";
+    public static final String EXTRA_HOUR = "alarm_hour";
+    public static final String EXTRA_MINUTE = "alarm_minute";
+    public static final String EXTRA_SNOOZE_MINUTES = "snooze_minutes";
     private static final int UPCOMING_OFFSET = 30 * 60 * 1000;
 
     private AlarmScheduler() {}
@@ -27,6 +34,9 @@ public final class AlarmScheduler {
     }
 
     private static long calculateNext(Alarm alarm, boolean respectSkip) {
+        if (alarm.isQuickAlarm && alarm.triggerAtMillis > 0) {
+            return Math.max(System.currentTimeMillis() + 1_000L, alarm.triggerAtMillis);
+        }
         Calendar now = Calendar.getInstance();
         Calendar next = (Calendar) now.clone();
         next.set(Calendar.HOUR_OF_DAY, alarm.hour);
@@ -78,21 +88,25 @@ public final class AlarmScheduler {
         if (!alarm.isActive || !canScheduleExact(context)) return;
         long when = nextTrigger(alarm);
         AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        cancelObsoleteActivityTrigger(context, manager, alarm.id);
         PendingIntent ring = PendingIntent.getBroadcast(context, alarm.id,
                 new Intent(context, AlarmReceiver.class).putExtra(EXTRA_ALARM_ID, alarm.id),
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         manager.setAlarmClock(new AlarmManager.AlarmClockInfo(when, ring), ring);
 
-        if (when - System.currentTimeMillis() > UPCOMING_OFFSET) {
+        long remaining=when-System.currentTimeMillis();
+        cancelUpcoming(context,alarm.id);
+        if (remaining > UPCOMING_OFFSET) {
             PendingIntent upcoming = PendingIntent.getBroadcast(context, 100000 + alarm.id,
                     new Intent(context, UpcomingReceiver.class).putExtra(EXTRA_ALARM_ID, alarm.id),
                     PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
             manager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, when - UPCOMING_OFFSET, upcoming);
-        }
+        } else if(remaining>0) UpcomingNotificationManager.show(context,alarm);
     }
 
     public static void scheduleSnooze(Context context, int alarmId, int minutes) {
         AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        cancelObsoleteActivityTrigger(context, manager, alarmId);
         PendingIntent ring = PendingIntent.getBroadcast(context, alarmId,
                 new Intent(context, AlarmReceiver.class).putExtra(EXTRA_ALARM_ID, alarmId),
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
@@ -139,8 +153,21 @@ public final class AlarmScheduler {
         PendingIntent ring = PendingIntent.getBroadcast(context, alarmId,
                 new Intent(context, AlarmReceiver.class), PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_IMMUTABLE);
         if (ring != null) manager.cancel(ring);
+        cancelObsoleteActivityTrigger(context, manager, alarmId);
+        cancelUpcoming(context,alarmId);
+    }
+
+    private static void cancelObsoleteActivityTrigger(Context context,AlarmManager manager,int alarmId) {
+        PendingIntent obsolete=PendingIntent.getActivity(context,alarmId,new Intent(context,RingActivity.class),
+                PendingIntent.FLAG_NO_CREATE|PendingIntent.FLAG_IMMUTABLE);
+        if(obsolete!=null)manager.cancel(obsolete);
+    }
+
+    public static void cancelUpcoming(Context context,int alarmId) {
+        AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         PendingIntent upcoming = PendingIntent.getBroadcast(context, 100000 + alarmId,
                 new Intent(context, UpcomingReceiver.class), PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_IMMUTABLE);
         if (upcoming != null) manager.cancel(upcoming);
+        UpcomingNotificationManager.cancel(context,alarmId);
     }
 }

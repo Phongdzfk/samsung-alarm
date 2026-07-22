@@ -8,7 +8,7 @@ import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 import com.example.samsung_alarm.data.model.Alarm;
 
-@Database(entities = {Alarm.class}, version = 2, exportSchema = false)
+@Database(entities = {Alarm.class}, version = 3, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
     private static volatile AppDatabase instance;
     public abstract AlarmDao alarmDao();
@@ -20,6 +20,12 @@ public abstract class AppDatabase extends RoomDatabase {
             database.execSQL("ALTER TABLE alarm_table ADD COLUMN vibrate INTEGER NOT NULL DEFAULT 1");
         }
     };
+    private static final Migration MIGRATION_2_3 = new Migration(2, 3) {
+        @Override public void migrate(SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE alarm_table ADD COLUMN isQuickAlarm INTEGER NOT NULL DEFAULT 0");
+            database.execSQL("ALTER TABLE alarm_table ADD COLUMN triggerAtMillis INTEGER NOT NULL DEFAULT 0");
+        }
+    };
 
     public static AppDatabase getInstance(Context context) {
         if (instance == null) {
@@ -27,7 +33,7 @@ public abstract class AppDatabase extends RoomDatabase {
                 if (instance == null) {
                     instance = Room.databaseBuilder(context.getApplicationContext(),
                             AppDatabase.class, "alarm_database")
-                            .addMigrations(MIGRATION_1_2)
+                            .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
                             .fallbackToDestructiveMigrationOnDowngrade().build();
                 }
             }

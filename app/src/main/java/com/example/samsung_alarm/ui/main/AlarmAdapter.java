@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.samsung_alarm.data.model.Alarm;
 import com.example.samsung_alarm.R;
+import com.example.samsung_alarm.service.AlarmScheduler;
 import com.google.android.material.materialswitch.MaterialSwitch;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +32,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.Holder> {
         String days = days(h.itemView, a);
         if (a.skipUntilMillis > System.currentTimeMillis()) days += "  ·  " + h.itemView.getContext().getString(R.string.skipped_badge);
         h.days.setText(days);
+        h.remaining.setText(remaining(h.itemView,a));
         h.active.setOnCheckedChangeListener(null);
         h.active.setChecked(a.isActive);
         h.active.setOnCheckedChangeListener((button, checked) -> listener.toggle(a, checked));
@@ -42,6 +44,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.Holder> {
         h.skip.setOnClickListener(v -> listener.skipNext(a));
         h.itemView.setAlpha(a.isActive ? 1f : .55f);
     }
+    private String remaining(View view,Alarm alarm){if(!alarm.isActive)return view.getContext().getString(R.string.alarm_disabled);long millis=Math.max(0,AlarmScheduler.nextTrigger(alarm)-System.currentTimeMillis());long totalMinutes=(millis+59_999L)/60_000L;if(totalMinutes<=0)return view.getContext().getString(R.string.alarm_soon);if(totalMinutes<60)return view.getContext().getString(R.string.alarm_after_minutes,totalMinutes);return view.getContext().getString(R.string.alarm_after_hours_minutes,totalMinutes/60,totalMinutes%60);}
     private String days(View view, Alarm a) {
         if (!a.repeats()) return view.getContext().getString(R.string.one_time);
         if (a.mon && a.tue && a.wed && a.thu && a.fri && a.sat && a.sun) return view.getContext().getString(R.string.every_day);
@@ -52,7 +55,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.Holder> {
     }
     @Override public int getItemCount() { return alarms.size(); }
     static class Holder extends RecyclerView.ViewHolder {
-        TextView time, label, days; MaterialSwitch active; ImageButton delete, skip; View content;
-        Holder(View v) { super(v); time=v.findViewById(R.id.itemTime); label=v.findViewById(R.id.itemLabel); days=v.findViewById(R.id.itemDays); active=v.findViewById(R.id.itemSwitch); delete=v.findViewById(R.id.itemDelete); skip=v.findViewById(R.id.itemSkip); content=v.findViewById(R.id.itemContent); }
+        TextView time, label, days, remaining; MaterialSwitch active; ImageButton delete, skip; View content;
+        Holder(View v) { super(v); time=v.findViewById(R.id.itemTime); label=v.findViewById(R.id.itemLabel); days=v.findViewById(R.id.itemDays); remaining=v.findViewById(R.id.itemRemaining); active=v.findViewById(R.id.itemSwitch); delete=v.findViewById(R.id.itemDelete); skip=v.findViewById(R.id.itemSkip); content=v.findViewById(R.id.itemContent); }
     }
 }

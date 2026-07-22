@@ -9,6 +9,7 @@ import com.example.samsung_alarm.data.database.AppDatabase;
 import com.example.samsung_alarm.data.model.Alarm;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.Calendar;
 
 /** Single entry point for alarm persistence and scheduling. */
 public final class AlarmRepository {
@@ -48,6 +49,7 @@ public final class AlarmRepository {
             if (active) AlarmScheduler.schedule(context, alarm); else AlarmScheduler.cancel(context, alarm.id);
         });
     }
+    public void disableSync(int id){Alarm alarm=dao.getById(id);if(alarm==null)return;alarm.isActive=false;dao.update(alarm);AlarmScheduler.cancel(context,id);}
     public void delete(Alarm alarm) {
         AppExecutors.DB.execute(() -> { AlarmScheduler.cancel(context, alarm.id); dao.delete(alarm); });
     }
@@ -60,8 +62,26 @@ public final class AlarmRepository {
             if (alarm.isActive) AlarmScheduler.schedule(context, alarm);
         });
     }
+    public void createQuickAlarm(int minutes, String label, boolean mathDismiss, Runnable done) {
+        Alarm alarm=new Alarm(); alarm.isQuickAlarm=true; alarm.isActive=true; alarm.keepAfterDismiss=false;
+        alarm.triggerAtMillis=System.currentTimeMillis()+minutes*60_000L; alarm.label=label;alarm.isMathDismiss=mathDismiss;alarm.mathDifficulty=1;
+        Calendar trigger=Calendar.getInstance(); trigger.setTimeInMillis(alarm.triggerAtMillis);
+        alarm.hour=trigger.get(Calendar.HOUR_OF_DAY); alarm.minute=trigger.get(Calendar.MINUTE);
+        save(alarm,done);
+    }
+    public void snoozeSync(int id, int minutes) {
+        Alarm alarm=dao.getById(id);
+        if(alarm!=null&&alarm.isQuickAlarm){alarm.triggerAtMillis=System.currentTimeMillis()+minutes*60_000L;Calendar trigger=Calendar.getInstance();trigger.setTimeInMillis(alarm.triggerAtMillis);alarm.hour=trigger.get(Calendar.HOUR_OF_DAY);alarm.minute=trigger.get(Calendar.MINUTE);dao.update(alarm);}
+        AlarmScheduler.scheduleSnooze(context,id,minutes);
+    }
     public void rescheduleAll() {
-        AppExecutors.DB.execute(() -> { for (Alarm alarm : dao.getActiveAlarms()) AlarmScheduler.schedule(context, alarm); });
+        AppExecutors.DB.execute(() -> {
+            long now=System.currentTimeMillis();
+            for (Alarm alarm : dao.getActiveAlarms()) {
+                if(alarm.isQuickAlarm&&alarm.triggerAtMillis<=now){alarm.isActive=false;dao.update(alarm);AlarmScheduler.cancel(context,alarm.id);}
+                else AlarmScheduler.schedule(context, alarm);
+            }
+        });
     }
     public void finishOneTimeSync(int id) {
         Alarm alarm = dao.getById(id);

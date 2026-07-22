@@ -7,9 +7,22 @@
         <item name="android:navigationBarColor">@color/white</item>
         <item name="android:statusBarColor">@color/surface</item>
         <item name="android:windowLightStatusBar">true</item>
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.SmartAlarm.MaterialAlertDialog</item>
     </style>
 
     <style name="Theme.Samsung_alarm" parent="Base.Theme.Samsung_alarm" />
+    <style name="Widget.SmartAlarm.DayButton" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="android:minWidth">0dp</item><item name="android:paddingLeft">0dp</item><item name="android:paddingRight">0dp</item>
+        <item name="android:textSize">12sp</item><item name="android:textColor">@color/day_button_text</item>
+        <item name="backgroundTint">@color/day_button_tint</item><item name="strokeColor">@color/primary</item><item name="strokeWidth">1dp</item>
+        <item name="cornerRadius">14dp</item>
+    </style>
+    <style name="ThemeOverlay.SmartAlarm.MaterialAlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearanceOverlay.SmartAlarm.Dialog</item>
+    </style>
+    <style name="ShapeAppearanceOverlay.SmartAlarm.Dialog" parent="">
+        <item name="cornerFamily">rounded</item><item name="cornerSize">28dp</item>
+    </style>
     <style name="Theme.Samsung_alarm.Ringing" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:windowFullscreen">true</item>
         <item name="android:colorAccent">@color/white</item>

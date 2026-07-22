@@ -48,6 +48,12 @@ public class AlarmRingingService extends Service {
 
     private void startRinging(int id, String label, Alarm alarm) {
         Intent full = new Intent(this, RingActivity.class).putExtra(AlarmScheduler.EXTRA_ALARM_ID, id)
+                .putExtra(AlarmScheduler.EXTRA_MATH_DISMISS, alarm != null && alarm.isMathDismiss)
+                .putExtra(AlarmScheduler.EXTRA_MATH_DIFFICULTY, alarm == null ? 1 : alarm.mathDifficulty)
+                .putExtra(AlarmScheduler.EXTRA_LABEL, label)
+                .putExtra(AlarmScheduler.EXTRA_HOUR, alarm == null ? -1 : alarm.hour)
+                .putExtra(AlarmScheduler.EXTRA_MINUTE, alarm == null ? -1 : alarm.minute)
+                .putExtra(AlarmScheduler.EXTRA_SNOOZE_MINUTES, alarm == null ? 5 : alarm.snoozeMinutes)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent fullScreen = PendingIntent.getActivity(this, id, full,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
@@ -60,13 +66,16 @@ public class AlarmRingingService extends Service {
         PendingIntent snooze = PendingIntent.getBroadcast(this, 400000 + Math.max(id, 0), snoozeIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NotificationHelper.ALARM_CHANNEL)
-                .setSmallIcon(R.drawable.ic_alarm).setContentTitle(getString(R.string.ringing_title))
+                .setSmallIcon(android.R.drawable.ic_lock_idle_alarm).setContentTitle(getString(R.string.ringing_title))
                 .setContentText(label).setCategory(NotificationCompat.CATEGORY_ALARM)
                 .setPriority(NotificationCompat.PRIORITY_MAX).setOngoing(true)
-                .setFullScreenIntent(fullScreen, true).setContentIntent(fullScreen)
-                .addAction(R.drawable.ic_snooze, getString(R.string.snooze), snooze);
-        // Không cho tắt từ notification nếu người dùng đã yêu cầu giải toán.
-        if (alarm == null || !alarm.isMathDismiss) builder.addAction(R.drawable.ic_close, getString(R.string.dismiss), dismiss);
+                .setContentIntent(fullScreen);
+        builder.setFullScreenIntent(fullScreen,true);
+        // Chế độ giải toán buộc người dùng mở màn hình báo thức, không cho tắt hoặc snooze từ notification.
+        if (alarm == null || !alarm.isMathDismiss) {
+            builder.addAction(android.R.drawable.ic_media_pause, getString(R.string.snooze), snooze);
+            builder.addAction(android.R.drawable.ic_menu_close_clear_cancel, getString(R.string.dismiss), dismiss);
+        }
         startForeground(42, builder.build());
         play(alarm);
 

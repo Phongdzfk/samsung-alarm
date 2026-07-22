@@ -24,6 +24,8 @@ public class Alarm {
     @ColumnInfo(defaultValue = "0") public long skipUntilMillis;
     @ColumnInfo(defaultValue = "0") public boolean gradualVolume;
     @ColumnInfo(defaultValue = "1") public boolean vibrate = true;
+    @ColumnInfo(defaultValue = "0") public boolean isQuickAlarm;
+    @ColumnInfo(defaultValue = "0") public long triggerAtMillis;
 
     public Alarm() {}
 

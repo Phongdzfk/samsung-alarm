@@ -2,11 +2,11 @@
     <string name="app_name">Smart Alarm</string><string name="channel_alarm">Ringing alarms</string><string name="channel_alarm_description">Alarm sound and full-screen alert</string><string name="channel_upcoming">Upcoming alarms</string><string name="channel_upcoming_description">Remind 30 minutes in advance</string>
     <string name="alarm">Alarm</string><string name="quick_alarm">Quick alarm</string><string name="timer">Timer</string><string name="stopwatch">Stopwatch</string>
     <string name="alarm_subtitle">Start your day on your terms</string><string name="quick_subtitle">One tap, ready on time</string><string name="timer_subtitle">Focus on the moment</string><string name="stopwatch_subtitle">Measure every moment precisely</string>
-    <string name="no_upcoming">No upcoming alarms</string><string name="upcoming_format">Next  ·  %1$s  ·  %2$s</string><string name="empty_alarms">⏰\nNo alarms yet\nTap + to create your first alarm</string>
+    <string name="no_upcoming">No upcoming alarms</string><string name="upcoming_format">Next  ·  %1$s  ·  %2$s</string><string name="empty_alarms">No alarms yet\nTap Add to create your first alarm</string>
     <string name="quick_description">Choose a duration and the alarm will ring when time is up.</string><string name="minutes_format">%1$d minutes</string><string name="minutes_5">5 minutes</string><string name="minutes_10">10 minutes</string><string name="minutes_15">15 minutes</string><string name="minutes_30">30 minutes</string><string name="custom_minutes">Custom minutes</string><string name="set_quick_alarm">Set quick alarm</string><string name="timer_range">Slide to choose 1–120 minutes</string>
     <string name="reset">Reset</string><string name="start">Start</string><string name="pause">Pause</string><string name="resume">Resume</string><string name="add_alarm">Add alarm</string>
-    <string name="nav_alarm">⏰\nAlarms</string><string name="nav_quick">⚡\nQuick</string><string name="nav_timer">⌛\nTimer</string><string name="nav_stopwatch">⏱\nStopwatch</string>
-    <string name="enter_minutes">Enter valid minutes</string><string name="quick_scheduled">Alarm set for %1$d minutes from now</string><string name="exact_alarm_permission">Exact alarm permission is required</string>
+    <string name="nav_alarm">Alarms</string><string name="nav_quick">Quick</string><string name="nav_timer">Timer</string><string name="nav_stopwatch">Stopwatch</string>
+    <string name="enter_minutes">Enter valid minutes</string><string name="quick_scheduled">Alarm set for %1$d minutes from now</string><string name="active_quick_alarms">Pending quick alarms</string><string name="quick_alarm_detail">%1$s · about %2$d minutes left</string><string name="quick_alarm_preview">8:30 AM · about 10 minutes left</string><string name="exact_alarm_permission">Exact alarm permission is required</string>
     <string name="delete_alarm_title">Delete alarm?</string><string name="cancel">Cancel</string><string name="delete">Delete</string><string name="delete_alarm_message">%1$02d:%2$02d · %3$s</string>
     <string name="one_time">Once</string><string name="every_day">Every day</string><string name="weekdays_short">Mon  Tue  Wed  Thu  Fri</string>
     <string name="day_mon">M</string><string name="day_tue">T</string><string name="day_wed">W</string><string name="day_thu">T</string><string name="day_fri">F</string><string name="day_sat">S</string><string name="day_sun">S</string>
@@ -19,4 +19,21 @@
     <string name="alarm_saved">Alarm saved</string><string name="solve_to_dismiss">Solve to dismiss</string><string name="enter_answer">Enter answer</string><string name="wrong_answer">Not quite, try again</string><string name="math_add">%1$d + %2$d = ?</string><string name="math_subtract">%1$d − %2$d = ?</string><string name="math_multiply">%1$d × %2$d = ?</string><string name="math_hard">%1$d + %2$d × %3$d = ?</string><string name="snooze_button">Snooze %1$d minutes</string><string name="dismiss_alarm">Dismiss alarm</string>
     <string name="ringing_title">Alarm ringing</string><string name="snooze">Snooze</string><string name="dismiss">Dismiss</string><string name="upcoming_notification_title">Alarm in 30 minutes</string><string name="timer_finished">Timer finished</string>
     <string name="settings">Settings</string><string name="appearance_language">Appearance &amp; language</string><string name="theme">Display mode</string><string-array name="theme_options"><item>System default</item><item>Light</item><item>Dark</item></string-array><string name="language">Language</string><string-array name="language_options"><item>Tiếng Việt</item><item>English</item></string-array><string name="done">Done</string>
+    <string name="no_quick_alarms">No quick alarms yet</string>
+    <string name="delete_quick_alarm_title">Delete quick alarm?</string>
+    <string name="swipe_up_to_dismiss">Swipe up to dismiss</string>
+    <string name="tap_to_dismiss">Or tap to dismiss</string>
+    <string name="solve_before_dismiss">Solve the problem before dismissing</string>
+    <string name="choose_alarm_sound">Choose alarm sound</string>
+    <string name="ringtone_selected_default">Default alarm sound</string>
+    <string name="check_answer">Check answer</string>
+    <string name="full_screen_permission_title">Allow full-screen alarms</string>
+    <string name="full_screen_permission_message">This permission lets alarms open full screen while the device is locked or showing the Home screen.</string>
+    <string name="open_settings">Open settings</string>
+    <string name="upcoming_persistent_title">Alarm at %1$s</string>
+    <string name="turn_off_alarm">Turn off alarm</string>
+    <string name="alarm_soon">Ringing soon</string>
+    <string name="alarm_disabled">Off</string>
+    <string name="alarm_after_minutes">Alarm in %1$d minutes</string>
+    <string name="alarm_after_hours_minutes">Alarm in %1$d hours %2$d minutes</string>
 </resources>

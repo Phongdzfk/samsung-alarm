@@ -1,36 +1,40 @@
 package com.example.samsung_alarm.ui.edit;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
+import android.app.NotificationManager;
+import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.samsung_alarm.R;
 import com.example.samsung_alarm.data.model.Alarm;
 import com.example.samsung_alarm.data.repository.AlarmRepository;
+import com.example.samsung_alarm.service.AlarmScheduler;
 import com.example.samsung_alarm.ui.common.SimpleSeekBarListener;
 import com.google.android.material.materialswitch.MaterialSwitch;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import java.util.Calendar;
+import java.util.ArrayList;
+import java.util.List;
 
 public class EditAlarmActivity extends AppCompatActivity {
-    private static final int PICK_RINGTONE=501;
     private AlarmRepository repository;
     private Alarm alarm;
     private TimePicker time;
     private TextInputEditText label;
-    private CheckBox mon,tue,wed,thu,fri,sat,sun;
+    private MaterialButton mon,tue,wed,thu,fri,sat,sun;
     private SeekBar volume,snooze,autoAfter;
     private TextView volumeLabel,snoozeLabel,autoAfterLabel,ringtoneButton;
     private MaterialSwitch math,keep,gradual,vibrate;
@@ -52,6 +56,7 @@ public class EditAlarmActivity extends AppCompatActivity {
         difficulty=findViewById(R.id.difficultySpinner);autoAction=findViewById(R.id.autoActionSpinner);
     }
     private void setup() {
+        mon.setCheckable(true);tue.setCheckable(true);wed.setCheckable(true);thu.setCheckable(true);fri.setCheckable(true);sat.setCheckable(true);sun.setCheckable(true);
         difficulty.setAdapter(ArrayAdapter.createFromResource(this,R.array.math_difficulties,android.R.layout.simple_spinner_dropdown_item));
         autoAction.setAdapter(ArrayAdapter.createFromResource(this,R.array.auto_actions,android.R.layout.simple_spinner_dropdown_item));
         math.setOnCheckedChangeListener((button,checked)->difficulty.setVisibility(checked?View.VISIBLE:View.GONE));
@@ -67,16 +72,19 @@ public class EditAlarmActivity extends AppCompatActivity {
         if(alarm.ringtoneUri!=null){ringtoneUri=Uri.parse(alarm.ringtoneUri);showRingtoneName();}
     }
     private void pickRingtone() {
-        Intent intent=new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE,RingtoneManager.TYPE_ALARM);intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT,false);intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI,ringtoneUri);startActivityForResult(intent,PICK_RINGTONE);
-    }
-    @Override protected void onActivityResult(int request,int result,@Nullable Intent data) {
-        super.onActivityResult(request,result,data);if(request==PICK_RINGTONE&&result==Activity.RESULT_OK&&data!=null){ringtoneUri=data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);showRingtoneName();}
+        RingtoneManager manager=new RingtoneManager(this);manager.setType(RingtoneManager.TYPE_ALARM);
+        List<String> names=new ArrayList<>();List<Uri> uris=new ArrayList<>();names.add(getString(R.string.ringtone_selected_default));uris.add(null);int selected=0;
+        android.database.Cursor cursor=manager.getCursor();
+        for(int position=0;position<cursor.getCount();position++){cursor.moveToPosition(position);Uri uri=manager.getRingtoneUri(position);names.add(cursor.getString(RingtoneManager.TITLE_COLUMN_INDEX));uris.add(uri);if(ringtoneUri!=null&&ringtoneUri.equals(uri))selected=position+1;}
+        new MaterialAlertDialogBuilder(this).setTitle(R.string.choose_alarm_sound).setSingleChoiceItems(names.toArray(new String[0]),selected,(dialog,which)->{ringtoneUri=uris.get(which);showRingtoneName();dialog.dismiss();}).setNegativeButton(R.string.cancel,null).show();
     }
     private void showRingtoneName() {
         if(ringtoneUri==null){ringtoneButton.setText(R.string.ringtone_default);return;} Ringtone ringtone=RingtoneManager.getRingtone(this,ringtoneUri);
         ringtoneButton.setText(getString(R.string.ringtone_format,ringtone==null?getString(R.string.ringtone_selected):ringtone.getTitle(this)));
     }
     private void save() {
+        if(!AlarmScheduler.canScheduleExact(this)){if(Build.VERSION.SDK_INT>=31)startActivity(AlarmScheduler.exactAlarmPermissionIntent(this));return;}
+        if(Build.VERSION.SDK_INT>=34){NotificationManager manager=getSystemService(NotificationManager.class);if(manager==null||!manager.canUseFullScreenIntent()){new MaterialAlertDialogBuilder(this).setTitle(R.string.full_screen_permission_title).setMessage(R.string.full_screen_permission_message).setNegativeButton(R.string.cancel,null).setPositiveButton(R.string.open_settings,(dialog,which)->startActivity(new Intent(Settings.ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT,Uri.parse("package:"+getPackageName())))).show();return;}}
         if(alarm==null)return;alarm.hour=time.getHour();alarm.minute=time.getMinute();String value=label.getText()==null?"":label.getText().toString().trim();alarm.label=value.isEmpty()?getString(R.string.alarm):value;
         alarm.mon=mon.isChecked();alarm.tue=tue.isChecked();alarm.wed=wed.isChecked();alarm.thu=thu.isChecked();alarm.fri=fri.isChecked();alarm.sat=sat.isChecked();alarm.sun=sun.isChecked();alarm.volume=volume.getProgress();alarm.ringtoneUri=ringtoneUri==null?null:ringtoneUri.toString();
         alarm.isMathDismiss=math.isChecked();alarm.mathDifficulty=difficulty.getSelectedItemPosition()+1;alarm.keepAfterDismiss=keep.isChecked();alarm.gradualVolume=gradual.isChecked();alarm.vibrate=vibrate.isChecked();alarm.autoAction=autoAction.getSelectedItemPosition();alarm.autoAfterMinutes=autoAfter.getProgress()+1;alarm.snoozeMinutes=snooze.getProgress()+1;alarm.isActive=true;

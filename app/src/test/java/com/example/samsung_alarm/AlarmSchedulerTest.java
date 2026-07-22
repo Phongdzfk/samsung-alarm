@@ -27,4 +27,11 @@ public class AlarmSchedulerTest {
         alarm.skipUntilMillis=System.currentTimeMillis()-60_000L;
         assertTrue(Math.abs(AlarmScheduler.nextTrigger(alarm)-AlarmScheduler.nextTriggerIgnoringSkip(alarm))<1_000L);
     }
+
+    @Test public void quickAlarms_keepIndependentAbsoluteTriggerTime() {
+        Alarm first=new Alarm();first.isQuickAlarm=true;first.triggerAtMillis=System.currentTimeMillis()+5*60_000L;
+        Alarm second=new Alarm();second.isQuickAlarm=true;second.triggerAtMillis=System.currentTimeMillis()+12*60_000L;
+        assertTrue(AlarmScheduler.nextTrigger(first)<AlarmScheduler.nextTrigger(second));
+        assertTrue(Math.abs(AlarmScheduler.nextTrigger(first)-first.triggerAtMillis)<1_000L);
+    }
 }

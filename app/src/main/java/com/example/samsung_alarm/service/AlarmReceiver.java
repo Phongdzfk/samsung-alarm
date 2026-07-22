@@ -11,20 +11,23 @@ import com.example.samsung_alarm.data.repository.AlarmRepository;
 public class AlarmReceiver extends BroadcastReceiver {
     public static final String ACTION_DISMISS = "com.example.samsung_alarm.DISMISS";
     public static final String ACTION_SNOOZE = "com.example.samsung_alarm.SNOOZE";
+    public static final String ACTION_DISABLE = "com.example.samsung_alarm.DISABLE";
 
     @Override public void onReceive(Context context, Intent intent) {
         int id = intent.getIntExtra(AlarmScheduler.EXTRA_ALARM_ID, -1);
+        if(ACTION_DISABLE.equals(intent.getAction())){PendingResult result=goAsync();AppExecutors.DB.execute(()->{try{AlarmRepository.get(context).disableSync(id);}finally{result.finish();}});return;}
         if (ACTION_DISMISS.equals(intent.getAction()) || ACTION_SNOOZE.equals(intent.getAction())) {
             context.stopService(new Intent(context, AlarmRingingService.class));
             if (ACTION_SNOOZE.equals(intent.getAction())) {
                 int minutes = intent.getIntExtra("minutes", 5);
-                AlarmScheduler.scheduleSnooze(context, id, minutes);
+                AppExecutors.DB.execute(() -> AlarmRepository.get(context).snoozeSync(id, minutes));
             } else if (id > 0) {
                 AppExecutors.DB.execute(() -> AlarmRepository.get(context).finishOneTimeSync(id));
             }
             return;
         }
 
+        if(id>0)UpcomingNotificationManager.cancel(context,id);
         Intent service = new Intent(context, AlarmRingingService.class)
                 .putExtra(AlarmScheduler.EXTRA_ALARM_ID, id)
                 .putExtra(AlarmScheduler.EXTRA_PREVIEW, intent.getStringExtra(AlarmScheduler.EXTRA_PREVIEW));

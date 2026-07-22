@@ -15,7 +15,7 @@
         </LinearLayout>
         <ImageButton android:id="@+id/settingsButton" android:layout_width="48dp" android:layout_height="48dp"
             android:background="?attr/selectableItemBackgroundBorderless" android:contentDescription="@string/settings"
-            android:src="@drawable/ic_settings" app:tint="@color/slate" />
+            android:src="@drawable/ic_settings_material" app:tint="@color/slate" />
     </LinearLayout>
 
     <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
@@ -29,6 +29,7 @@
                 android:clipToPadding="false" android:paddingBottom="88dp" />
             <TextView android:id="@+id/emptyText" android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:layout_gravity="center" android:gravity="center" android:text="@string/empty_alarms"
+                android:drawableTop="@android:drawable/ic_lock_idle_alarm" android:drawablePadding="12dp" android:drawableTint="@color/slate"
                 android:textColor="@color/slate" android:textSize="17sp" android:visibility="gone" />
         </LinearLayout>
 
@@ -53,6 +54,15 @@
                 </com.google.android.material.textfield.TextInputLayout>
                 <com.google.android.material.button.MaterialButton android:id="@+id/quickStart"
                     android:layout_width="match_parent" android:layout_height="56dp" android:layout_marginTop="8dp" android:text="@string/set_quick_alarm" />
+                <com.google.android.material.materialswitch.MaterialSwitch android:id="@+id/quickMathSwitch"
+                    android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp"
+                    android:text="@string/math_dismiss" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="24dp"
+                    android:text="@string/active_quick_alarms" android:textColor="@color/navy" android:textSize="17sp" android:textStyle="bold" />
+                <androidx.recyclerview.widget.RecyclerView android:id="@+id/quickAlarmList" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:nestedScrollingEnabled="false" />
+                <TextView android:id="@+id/quickEmptyText" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:gravity="center" android:padding="20dp" android:text="@string/no_quick_alarms" android:textColor="@color/slate" />
             </LinearLayout>
         </ScrollView>
 
@@ -85,15 +95,15 @@
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton android:id="@+id/addAlarm"
             android:layout_width="64dp" android:layout_height="64dp" android:layout_gravity="bottom|end"
-            android:layout_margin="22dp" android:contentDescription="@string/add_alarm" android:src="@drawable/ic_add"
-            app:backgroundTint="@color/primary" app:tint="@color/white" />
+            android:layout_margin="22dp" android:contentDescription="@string/add_alarm" android:src="@android:drawable/ic_input_add"
+            android:scaleType="center" app:backgroundTint="@color/primary" app:fabCustomSize="64dp" app:maxImageSize="24dp" app:tint="@color/white" />
     </FrameLayout>
 
     <LinearLayout android:layout_width="match_parent" android:layout_height="70dp" android:background="@color/card"
         android:gravity="center" android:orientation="horizontal" android:paddingHorizontal="8dp">
-        <Button android:id="@+id/navAlarm" style="@style/Widget.Material3.Button.TextButton" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:text="@string/nav_alarm" android:textAllCaps="false" />
-        <Button android:id="@+id/navQuick" style="@style/Widget.Material3.Button.TextButton" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:text="@string/nav_quick" android:textAllCaps="false" />
-        <Button android:id="@+id/navTimer" style="@style/Widget.Material3.Button.TextButton" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:text="@string/nav_timer" android:textAllCaps="false" />
-        <Button android:id="@+id/navStopwatch" style="@style/Widget.Material3.Button.TextButton" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:text="@string/nav_stopwatch" android:textAllCaps="false" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/navAlarm" style="@style/Widget.Material3.Button.TextButton" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:text="@string/nav_alarm" android:textAllCaps="false" android:textSize="11sp" app:icon="@android:drawable/ic_lock_idle_alarm" app:iconGravity="top" app:iconTint="@color/primary" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/navQuick" style="@style/Widget.Material3.Button.TextButton" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:text="@string/nav_quick" android:textAllCaps="false" android:textSize="11sp" app:icon="@android:drawable/ic_media_ff" app:iconGravity="top" app:iconTint="@color/primary" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/navTimer" style="@style/Widget.Material3.Button.TextButton" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:text="@string/nav_timer" android:textAllCaps="false" android:textSize="11sp" app:icon="@android:drawable/ic_menu_recent_history" app:iconGravity="top" app:iconTint="@color/primary" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/navStopwatch" style="@style/Widget.Material3.Button.TextButton" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:text="@string/nav_stopwatch" android:textAllCaps="false" android:textSize="11sp" app:icon="@android:drawable/ic_media_play" app:iconGravity="top" app:iconTint="@color/primary" />
     </LinearLayout>
 </LinearLayout>

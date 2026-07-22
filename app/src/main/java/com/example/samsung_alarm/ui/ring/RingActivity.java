@@ -4,7 +4,9 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
+import android.view.MotionEvent;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 import androidx.activity.OnBackPressedCallback;
@@ -23,21 +25,27 @@ public class RingActivity extends AppCompatActivity {
     private Alarm alarm;
     private TextView question,error,snooze;
     private EditText input;
+    private View dismissGesture,dismissButton;
+    private float swipeStartY;
+    private boolean alarmLoaded;
 
     @Override protected void onCreate(Bundle state) {
         super.onCreate(state);
         if(Build.VERSION.SDK_INT>=27){setShowWhenLocked(true);setTurnScreenOn(true);}else getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED|WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON|WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);setContentView(R.layout.activity_ring);
         getOnBackPressedDispatcher().addCallback(this,new OnBackPressedCallback(true){@Override public void handleOnBackPressed(){}});
-        alarmId=getIntent().getIntExtra(AlarmScheduler.EXTRA_ALARM_ID,-1);question=findViewById(R.id.mathQuestion);error=findViewById(R.id.mathError);input=findViewById(R.id.mathAnswer);snooze=findViewById(R.id.snoozeButton);
+        alarmId=getIntent().getIntExtra(AlarmScheduler.EXTRA_ALARM_ID,-1);question=findViewById(R.id.mathQuestion);error=findViewById(R.id.mathError);input=findViewById(R.id.mathAnswer);snooze=findViewById(R.id.snoozeButton);dismissGesture=findViewById(R.id.dismissGesture);dismissButton=findViewById(R.id.dismissButton);
         Calendar now=Calendar.getInstance();((TextView)findViewById(R.id.ringTime)).setText(String.format(Locale.getDefault(),"%02d:%02d",now.get(Calendar.HOUR_OF_DAY),now.get(Calendar.MINUTE)));
-        findViewById(R.id.dismissButton).setOnClickListener(v->dismiss());snooze.setOnClickListener(v->snooze());
-        if(alarmId>0)AlarmRepository.get(this).getById(alarmId,value->runOnUiThread(()->apply(value)));else((TextView)findViewById(R.id.ringLabel)).setText(R.string.quick_alarm);
+        dismissButton.setOnClickListener(v->dismiss());dismissGesture.setOnTouchListener(this::handleSwipe);snooze.setOnClickListener(v->snooze());findViewById(R.id.checkMathButton).setOnClickListener(v->dismiss());
+        input.setImeOptions(EditorInfo.IME_ACTION_DONE);input.setOnEditorActionListener((view,action,event)->{if(action==EditorInfo.IME_ACTION_DONE){dismiss();return true;}return false;});
+        setDismissEnabled(alarmId<=0);
+        if(alarmId>0){applyIntentPreview(getIntent());AlarmRepository.get(this).getById(alarmId,value->runOnUiThread(()->apply(value)));}else{alarmLoaded=true;((TextView)findViewById(R.id.ringLabel)).setText(R.string.quick_alarm);}
     }
     private void apply(Alarm value) {
-        alarm=value;if(alarm==null)return;((TextView)findViewById(R.id.ringTime)).setText(String.format(Locale.getDefault(),"%02d:%02d",alarm.hour,alarm.minute));((TextView)findViewById(R.id.ringLabel)).setText(alarm.label);
-        snooze.setText(getString(R.string.snooze_button,alarm.snoozeMinutes));if(alarm.isMathDismiss){findViewById(R.id.mathPanel).setVisibility(View.VISIBLE);newProblem();}
+        boolean mathWasVisible=findViewById(R.id.mathPanel).getVisibility()==View.VISIBLE;alarm=value;if(alarm==null)return;alarmLoaded=true;setDismissEnabled(true);((TextView)findViewById(R.id.ringTime)).setText(String.format(Locale.getDefault(),"%02d:%02d",alarm.hour,alarm.minute));((TextView)findViewById(R.id.ringLabel)).setText(alarm.label);
+        snooze.setText(getString(R.string.snooze_button,alarm.snoozeMinutes));snooze.setVisibility(alarm.isMathDismiss?View.GONE:View.VISIBLE);findViewById(R.id.mathPanel).setVisibility(alarm.isMathDismiss?View.VISIBLE:View.GONE);if(alarm.isMathDismiss&&!mathWasVisible)newProblem();
     }
+    private void applyIntentPreview(Intent intent){if(!intent.hasExtra(AlarmScheduler.EXTRA_MATH_DISMISS))return;Alarm preview=new Alarm();preview.isMathDismiss=intent.getBooleanExtra(AlarmScheduler.EXTRA_MATH_DISMISS,false);preview.mathDifficulty=intent.getIntExtra(AlarmScheduler.EXTRA_MATH_DIFFICULTY,1);preview.label=intent.getStringExtra(AlarmScheduler.EXTRA_LABEL);preview.hour=intent.getIntExtra(AlarmScheduler.EXTRA_HOUR,0);preview.minute=intent.getIntExtra(AlarmScheduler.EXTRA_MINUTE,0);preview.snoozeMinutes=intent.getIntExtra(AlarmScheduler.EXTRA_SNOOZE_MINUTES,5);apply(preview);}
     private void newProblem() {
         Random random=new Random();int level=alarm==null?1:alarm.mathDifficulty;
         if(level==1){int a=random.nextInt(40)+5,b=random.nextInt(30)+1;boolean minus=random.nextBoolean();if(minus&&b>a){int t=a;a=b;b=t;}answer=minus?a-b:a+b;question.setText(getString(minus?R.string.math_subtract:R.string.math_add,a,b));}
@@ -45,9 +53,12 @@ public class RingActivity extends AppCompatActivity {
         else{int a=random.nextInt(15)+2,b=random.nextInt(10)+2,c=random.nextInt(8)+2;answer=a+b*c;question.setText(getString(R.string.math_hard,a,b,c));}input.setText("");
     }
     private void dismiss() {
+        if(!alarmLoaded)return;
         if(alarm!=null&&alarm.isMathDismiss){int entered;try{entered=Integer.parseInt(input.getText().toString().trim());}catch(NumberFormatException e){entered=Integer.MIN_VALUE;}if(entered!=answer){error.setText(R.string.wrong_answer);newProblem();return;}}
         send(AlarmReceiver.ACTION_DISMISS,0);
     }
+    private boolean handleSwipe(View view, MotionEvent event){if(!alarmLoaded)return true;switch(event.getAction()){case MotionEvent.ACTION_DOWN:swipeStartY=event.getRawY();return true;case MotionEvent.ACTION_MOVE:float offset=Math.min(0,event.getRawY()-swipeStartY);view.setTranslationY(Math.max(-120,offset));return true;case MotionEvent.ACTION_UP:case MotionEvent.ACTION_CANCEL:float distance=swipeStartY-event.getRawY();view.animate().translationY(0).setDuration(180).start();if(distance>100)dismiss();return true;default:return false;}}
+    private void setDismissEnabled(boolean enabled){alarmLoaded=enabled;dismissButton.setEnabled(enabled);dismissGesture.setAlpha(enabled?1f:.45f);}
     private void snooze(){send(AlarmReceiver.ACTION_SNOOZE,alarm==null?5:alarm.snoozeMinutes);}
     private void send(String action,int minutes){sendBroadcast(new Intent(this,AlarmReceiver.class).setAction(action).putExtra(AlarmScheduler.EXTRA_ALARM_ID,alarmId).putExtra("minutes",minutes));finishAndRemoveTask();}
 }
