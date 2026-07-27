@@ -26,14 +26,29 @@
         <com.google.android.material.button.MaterialButton android:id="@+id/snoozeButton"
             style="@style/Widget.Material3.Button.TonalButton" android:layout_width="match_parent" android:layout_height="54dp"
             android:text="@string/snooze_5" android:textSize="16sp" />
-        <LinearLayout android:id="@+id/dismissGesture" android:layout_width="match_parent" android:layout_height="96dp"
-            android:layout_marginTop="10dp" android:background="@drawable/bg_swipe_action" android:gravity="center" android:orientation="vertical">
-            <ImageView android:layout_width="28dp" android:layout_height="28dp" android:contentDescription="@null"
-                android:rotation="-90" android:src="@android:drawable/ic_media_next" app:tint="@color/primary_dark" />
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/swipe_up_to_dismiss"
-                android:textColor="@color/primary_dark" android:textStyle="bold" />
-        </LinearLayout>
-        <com.google.android.material.button.MaterialButton android:id="@+id/dismissButton" style="@style/Widget.Material3.Button.TextButton"
-            android:layout_width="match_parent" android:layout_height="50dp" android:text="@string/tap_to_dismiss" android:textColor="@color/white" />
+        <TextView android:id="@+id/swipeHint" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_marginTop="14dp" android:text="@string/swipe_up_to_dismiss"
+            android:textColor="#D9FFFFFF" android:textSize="13sp" android:textStyle="bold" />
+        <FrameLayout android:id="@+id/dismissGesture" android:layout_width="match_parent" android:layout_height="112dp"
+            android:layout_marginTop="8dp" android:background="@drawable/bg_swipe_track"
+            android:contentDescription="@string/swipe_up_to_dismiss" android:padding="7dp">
+            <ImageView android:layout_width="22dp" android:layout_height="22dp"
+                android:layout_gravity="top|center_horizontal" android:layout_marginTop="7dp"
+                android:contentDescription="@null" android:rotation="-90"
+                android:src="@android:drawable/ic_media_next" app:tint="#B3FFFFFF" />
+            <FrameLayout android:id="@+id/swipeThumb" android:layout_width="58dp" android:layout_height="58dp"
+                android:layout_gravity="bottom|center_horizontal" android:background="@drawable/bg_swipe_thumb"
+                android:elevation="8dp">
+                <ImageView android:layout_width="26dp" android:layout_height="26dp"
+                    android:layout_gravity="center" android:contentDescription="@null" android:rotation="-90"
+                    android:src="@android:drawable/ic_media_next" app:tint="@color/primary_dark" />
+            </FrameLayout>
+        </FrameLayout>
+        <com.google.android.material.button.MaterialButton android:id="@+id/dismissButton"
+            android:layout_width="match_parent" android:layout_height="54dp" android:layout_marginTop="12dp"
+            android:text="@string/dismiss_alarm" android:textColor="@color/white"
+            app:backgroundTint="@color/danger" app:cornerRadius="18dp"
+            app:icon="@android:drawable/ic_menu_close_clear_cancel" app:iconGravity="textStart"
+            app:iconTint="@color/white" />
     </LinearLayout>
 </FrameLayout>

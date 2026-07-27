@@ -36,4 +36,8 @@
     <string name="alarm_disabled">Off</string>
     <string name="alarm_after_minutes">Alarm in %1$d minutes</string>
     <string name="alarm_after_hours_minutes">Alarm in %1$d hours %2$d minutes</string>
+    <string name="choose_music_from_device">Choose music from device…</string>
+    <string name="preview_sound">Preview alarm sound</string>
+    <string name="stop_preview">Stop preview</string>
+    <string name="unable_to_play_sound">Unable to play this audio file</string>
 </resources>

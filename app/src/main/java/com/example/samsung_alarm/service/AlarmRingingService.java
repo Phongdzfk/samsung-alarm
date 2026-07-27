@@ -93,9 +93,20 @@ public class AlarmRingingService extends Service {
 
     private void play(Alarm alarm) {
         stopMedia();
+        Uri defaultUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+        Uri requested = alarm != null && alarm.ringtoneUri != null ? Uri.parse(alarm.ringtoneUri) : defaultUri;
+        boolean started = startPlayer(requested, alarm);
+        if (!started && alarm != null && alarm.ringtoneUri != null) startPlayer(defaultUri, alarm);
+        if (alarm == null || alarm.vibrate) {
+            vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+            if (android.os.Build.VERSION.SDK_INT >= 26) vibrator.vibrate(VibrationEffect.createWaveform(new long[]{0, 500, 500}, 0));
+            else vibrator.vibrate(new long[]{0, 500, 500}, 0);
+        }
+    }
+
+    private boolean startPlayer(Uri uri, Alarm alarm) {
+        if (uri == null) return false;
         try {
-            Uri uri = alarm != null && alarm.ringtoneUri != null ? Uri.parse(alarm.ringtoneUri)
-                    : RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
             player = new MediaPlayer();
             player.setDataSource(this, uri);
             player.setAudioAttributes(new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_ALARM)
@@ -111,11 +122,14 @@ public class AlarmRingingService extends Service {
                 volumeFade=new Runnable(){@Override public void run(){if(player==null)return;current[0]=Math.min(target,current[0]+step);player.setVolume(current[0],current[0]);if(current[0]<target)handler.postDelayed(this,3_000L);}};
                 handler.postDelayed(volumeFade,3_000L);
             }
-        } catch (Exception ignored) { }
-        if (alarm == null || alarm.vibrate) {
-            vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-            if (android.os.Build.VERSION.SDK_INT >= 26) vibrator.vibrate(VibrationEffect.createWaveform(new long[]{0, 500, 500}, 0));
-            else vibrator.vibrate(new long[]{0, 500, 500}, 0);
+            return true;
+        } catch (Exception ignored) {
+            if (player != null) {
+                try { player.release(); } catch (Exception releaseIgnored) {}
+                player = null;
+            }
+            if (volumeFade != null) { handler.removeCallbacks(volumeFade); volumeFade=null; }
+            return false;
         }
     }
 

@@ -33,7 +33,8 @@
                 android:textColor="@color/slate" android:textSize="17sp" android:visibility="gone" />
         </LinearLayout>
 
-        <ScrollView android:id="@+id/paneQuick" android:layout_width="match_parent" android:layout_height="match_parent" android:visibility="gone">
+        <androidx.core.widget.NestedScrollView android:id="@+id/paneQuick" android:layout_width="match_parent"
+            android:layout_height="match_parent" android:fillViewport="true" android:visibility="gone">
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="20dp">
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/quick_alarm"
                     android:textColor="@color/navy" android:textSize="22sp" android:textStyle="bold" />
@@ -64,7 +65,7 @@
                 <TextView android:id="@+id/quickEmptyText" android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:gravity="center" android:padding="20dp" android:text="@string/no_quick_alarms" android:textColor="@color/slate" />
             </LinearLayout>
-        </ScrollView>
+        </androidx.core.widget.NestedScrollView>
 
         <LinearLayout android:id="@+id/paneTimer" android:layout_width="match_parent" android:layout_height="match_parent"
             android:visibility="gone" android:orientation="vertical" android:gravity="center_horizontal" android:padding="24dp">

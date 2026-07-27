@@ -10,22 +10,22 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 import androidx.activity.OnBackPressedCallback;
-import androidx.appcompat.app.AppCompatActivity;
 import com.example.samsung_alarm.R;
 import com.example.samsung_alarm.service.AlarmReceiver;
 import com.example.samsung_alarm.service.AlarmScheduler;
 import com.example.samsung_alarm.data.model.Alarm;
 import com.example.samsung_alarm.data.repository.AlarmRepository;
+import com.example.samsung_alarm.ui.common.LocalizedActivity;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.Random;
 
-public class RingActivity extends AppCompatActivity {
+public class RingActivity extends LocalizedActivity {
     private int alarmId, answer;
     private Alarm alarm;
     private TextView question,error,snooze;
     private EditText input;
-    private View dismissGesture,dismissButton;
+    private View dismissGesture,dismissButton,swipeThumb,swipeHint;
     private float swipeStartY;
     private boolean alarmLoaded;
 
@@ -34,7 +34,7 @@ public class RingActivity extends AppCompatActivity {
         if(Build.VERSION.SDK_INT>=27){setShowWhenLocked(true);setTurnScreenOn(true);}else getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED|WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON|WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);setContentView(R.layout.activity_ring);
         getOnBackPressedDispatcher().addCallback(this,new OnBackPressedCallback(true){@Override public void handleOnBackPressed(){}});
-        alarmId=getIntent().getIntExtra(AlarmScheduler.EXTRA_ALARM_ID,-1);question=findViewById(R.id.mathQuestion);error=findViewById(R.id.mathError);input=findViewById(R.id.mathAnswer);snooze=findViewById(R.id.snoozeButton);dismissGesture=findViewById(R.id.dismissGesture);dismissButton=findViewById(R.id.dismissButton);
+        alarmId=getIntent().getIntExtra(AlarmScheduler.EXTRA_ALARM_ID,-1);question=findViewById(R.id.mathQuestion);error=findViewById(R.id.mathError);input=findViewById(R.id.mathAnswer);snooze=findViewById(R.id.snoozeButton);dismissGesture=findViewById(R.id.dismissGesture);dismissButton=findViewById(R.id.dismissButton);swipeThumb=findViewById(R.id.swipeThumb);swipeHint=findViewById(R.id.swipeHint);
         Calendar now=Calendar.getInstance();((TextView)findViewById(R.id.ringTime)).setText(String.format(Locale.getDefault(),"%02d:%02d",now.get(Calendar.HOUR_OF_DAY),now.get(Calendar.MINUTE)));
         dismissButton.setOnClickListener(v->dismiss());dismissGesture.setOnTouchListener(this::handleSwipe);snooze.setOnClickListener(v->snooze());findViewById(R.id.checkMathButton).setOnClickListener(v->dismiss());
         input.setImeOptions(EditorInfo.IME_ACTION_DONE);input.setOnEditorActionListener((view,action,event)->{if(action==EditorInfo.IME_ACTION_DONE){dismiss();return true;}return false;});
@@ -54,10 +54,33 @@ public class RingActivity extends AppCompatActivity {
     }
     private void dismiss() {
         if(!alarmLoaded)return;
-        if(alarm!=null&&alarm.isMathDismiss){int entered;try{entered=Integer.parseInt(input.getText().toString().trim());}catch(NumberFormatException e){entered=Integer.MIN_VALUE;}if(entered!=answer){error.setText(R.string.wrong_answer);newProblem();return;}}
+        if(alarm!=null&&alarm.isMathDismiss){int entered;try{entered=Integer.parseInt(input.getText().toString().trim());}catch(NumberFormatException e){entered=Integer.MIN_VALUE;}if(entered!=answer){error.setText(R.string.wrong_answer);newProblem();resetSwipe();return;}}
         send(AlarmReceiver.ACTION_DISMISS,0);
     }
-    private boolean handleSwipe(View view, MotionEvent event){if(!alarmLoaded)return true;switch(event.getAction()){case MotionEvent.ACTION_DOWN:swipeStartY=event.getRawY();return true;case MotionEvent.ACTION_MOVE:float offset=Math.min(0,event.getRawY()-swipeStartY);view.setTranslationY(Math.max(-120,offset));return true;case MotionEvent.ACTION_UP:case MotionEvent.ACTION_CANCEL:float distance=swipeStartY-event.getRawY();view.animate().translationY(0).setDuration(180).start();if(distance>100)dismiss();return true;default:return false;}}
+    private boolean handleSwipe(View view, MotionEvent event){
+        if(!alarmLoaded)return true;
+        float density=getResources().getDisplayMetrics().density;
+        float travel=40f*density;
+        switch(event.getAction()){
+            case MotionEvent.ACTION_DOWN:
+                swipeStartY=event.getRawY();view.getParent().requestDisallowInterceptTouchEvent(true);return true;
+            case MotionEvent.ACTION_MOVE:
+                float distance=Math.max(0,swipeStartY-event.getRawY());
+                float progress=Math.min(1f,distance/travel);
+                swipeThumb.setTranslationY(-travel*progress);
+                swipeHint.setAlpha(1f-.45f*progress);
+                return true;
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:
+                float releasedDistance=Math.max(0,swipeStartY-event.getRawY());
+                if(releasedDistance>=travel*.78f){swipeThumb.animate().translationY(-travel).setDuration(120).withEndAction(this::dismiss).start();}
+                else{swipeThumb.animate().translationY(0).setDuration(180).start();swipeHint.animate().alpha(1f).setDuration(180).start();}
+                view.getParent().requestDisallowInterceptTouchEvent(false);
+                return true;
+            default:return false;
+        }
+    }
+    private void resetSwipe(){swipeThumb.animate().translationY(0).setDuration(180).start();swipeHint.animate().alpha(1f).setDuration(180).start();}
     private void setDismissEnabled(boolean enabled){alarmLoaded=enabled;dismissButton.setEnabled(enabled);dismissGesture.setAlpha(enabled?1f:.45f);}
     private void snooze(){send(AlarmReceiver.ACTION_SNOOZE,alarm==null?5:alarm.snoozeMinutes);}
     private void send(String action,int minutes){sendBroadcast(new Intent(this,AlarmReceiver.class).setAction(action).putExtra(AlarmScheduler.EXTRA_ALARM_ID,alarmId).putExtra("minutes",minutes));finishAndRemoveTask();}

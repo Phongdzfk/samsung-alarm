@@ -3,6 +3,8 @@ package com.example.samsung_alarm.ui.main;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.os.Handler;
+import android.os.Looper;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -18,6 +20,13 @@ import java.util.Locale;
 public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.Holder> {
     public interface Listener { void edit(Alarm alarm); void toggle(Alarm alarm, boolean active); void delete(Alarm alarm); void skipNext(Alarm alarm); }
     private final Listener listener;
+    private final Handler clockHandler = new Handler(Looper.getMainLooper());
+    private final Runnable clockTick = new Runnable() {
+        @Override public void run() {
+            notifyItemRangeChanged(0, getItemCount(), "clock");
+            scheduleNextClockTick();
+        }
+    };
     private List<Alarm> alarms = new ArrayList<>();
     public AlarmAdapter(Listener listener) { this.listener = listener; }
     public void submit(List<Alarm> value) { alarms = value == null ? new ArrayList<>() : value; notifyDataSetChanged(); }
@@ -42,7 +51,23 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.Holder> {
         h.skip.setContentDescription(h.itemView.getContext().getString(a.skipUntilMillis > System.currentTimeMillis() ? R.string.undo_skip : R.string.skip_next));
         h.skip.setAlpha(a.skipUntilMillis > System.currentTimeMillis() ? .45f : 1f);
         h.skip.setOnClickListener(v -> listener.skipNext(a));
-        h.itemView.setAlpha(a.isActive ? 1f : .55f);
+        h.itemView.setAlpha(1f);
+        h.content.setAlpha(a.isActive ? 1f : .55f);
+        h.active.setAlpha(1f);
+        h.delete.setAlpha(1f);
+    }
+    @Override public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+        scheduleNextClockTick();
+    }
+    @Override public void onDetachedFromRecyclerView(@NonNull RecyclerView recyclerView) {
+        clockHandler.removeCallbacks(clockTick);
+        super.onDetachedFromRecyclerView(recyclerView);
+    }
+    private void scheduleNextClockTick() {
+        clockHandler.removeCallbacks(clockTick);
+        long delay=1_000L-(System.currentTimeMillis()%1_000L)+20L;
+        clockHandler.postDelayed(clockTick,delay);
     }
     private String remaining(View view,Alarm alarm){if(!alarm.isActive)return view.getContext().getString(R.string.alarm_disabled);long millis=Math.max(0,AlarmScheduler.nextTrigger(alarm)-System.currentTimeMillis());long totalMinutes=(millis+59_999L)/60_000L;if(totalMinutes<=0)return view.getContext().getString(R.string.alarm_soon);if(totalMinutes<60)return view.getContext().getString(R.string.alarm_after_minutes,totalMinutes);return view.getContext().getString(R.string.alarm_after_hours_minutes,totalMinutes/60,totalMinutes%60);}
     private String days(View view, Alarm a) {

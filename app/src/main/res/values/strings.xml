@@ -103,4 +103,8 @@
     <string name="alarm_disabled">Đã tắt</string>
     <string name="alarm_after_minutes">Báo thức sau %1$d phút</string>
     <string name="alarm_after_hours_minutes">Báo thức sau %1$d giờ %2$d phút</string>
+    <string name="choose_music_from_device">Chọn nhạc từ thiết bị…</string>
+    <string name="preview_sound">Nghe thử âm báo</string>
+    <string name="stop_preview">Dừng nghe thử</string>
+    <string name="unable_to_play_sound">Không thể phát file âm thanh này</string>
 </resources>

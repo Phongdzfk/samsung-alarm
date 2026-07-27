@@ -15,7 +15,6 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.graphics.Insets;
@@ -31,13 +30,14 @@ import com.example.samsung_alarm.data.model.Alarm;
 import com.example.samsung_alarm.data.repository.AlarmRepository;
 import com.example.samsung_alarm.settings.AppPreferences;
 import com.example.samsung_alarm.ui.edit.EditAlarmActivity;
+import com.example.samsung_alarm.ui.common.LocalizedActivity;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements AlarmAdapter.Listener {
+public class MainActivity extends LocalizedActivity implements AlarmAdapter.Listener {
     private AlarmRepository repository;
     private View alarmsPane, quickPane, timerPane, stopwatchPane, addButton;
     private TextView title, subtitle, upcoming, empty;

@@ -22,18 +22,23 @@ public final class UpcomingNotificationManager {
 
     public static void show(Context context, Alarm alarm) {
         if(alarm==null||!alarm.isActive)return;
+        showAt(context,alarm,AlarmScheduler.nextTrigger(alarm));
+    }
+
+    public static void showAt(Context context, Alarm alarm, long triggerAtMillis) {
+        if(alarm==null||!alarm.isActive||triggerAtMillis<=System.currentTimeMillis())return;
         NotificationHelper.createChannels(context);
         PendingIntent open=PendingIntent.getActivity(context,alarm.id,new Intent(context,MainActivity.class),PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_IMMUTABLE);
         Intent disableIntent=new Intent(context,AlarmReceiver.class).setAction(AlarmReceiver.ACTION_DISABLE)
                 .putExtra(AlarmScheduler.EXTRA_ALARM_ID,alarm.id);
         PendingIntent disable=PendingIntent.getBroadcast(context,DISABLE_OFFSET+alarm.id,disableIntent,PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_IMMUTABLE);
-        String time=DateFormat.getTimeInstance(DateFormat.SHORT).format(new Date(AlarmScheduler.nextTrigger(alarm)));
+        String time=DateFormat.getTimeInstance(DateFormat.SHORT).format(new Date(triggerAtMillis));
         NotificationCompat.Builder notification=new NotificationCompat.Builder(context,NotificationHelper.UPCOMING_CHANNEL)
                 .setSmallIcon(android.R.drawable.ic_lock_idle_alarm).setContentTitle(context.getString(R.string.upcoming_persistent_title,time))
                 .setContentText(alarm.label).setContentIntent(open).setOngoing(true).setAutoCancel(false).setOnlyAlertOnce(true)
                 .setCategory(NotificationCompat.CATEGORY_ALARM).setPriority(NotificationCompat.PRIORITY_DEFAULT).setSilent(true)
                 .addAction(android.R.drawable.ic_menu_close_clear_cancel,context.getString(R.string.turn_off_alarm),disable);
-        long remaining=AlarmScheduler.nextTrigger(alarm)-System.currentTimeMillis();
+        long remaining=triggerAtMillis-System.currentTimeMillis();
         if(remaining>0)notification.setTimeoutAfter(remaining);
         if(Build.VERSION.SDK_INT<33||ContextCompat.checkSelfPermission(context,Manifest.permission.POST_NOTIFICATIONS)==PackageManager.PERMISSION_GRANTED)
             context.getSystemService(NotificationManager.class).notify(NOTIFICATION_OFFSET+alarm.id,notification.build());

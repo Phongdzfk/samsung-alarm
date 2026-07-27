@@ -23,6 +23,10 @@
                 <com.google.android.material.button.MaterialButton android:id="@+id/daySun" style="@style/Widget.SmartAlarm.DayButton" android:layout_width="0dp" android:layout_height="48dp" android:layout_weight="1" android:text="@string/day_sun" />
             </LinearLayout>
             <com.google.android.material.button.MaterialButton android:id="@+id/ringtoneButton" style="@style/Widget.Material3.Button.TonalButton" android:layout_width="match_parent" android:layout_height="56dp" android:layout_marginTop="18dp" android:text="@string/ringtone_default" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/previewRingtoneButton"
+                style="@style/Widget.Material3.Button.TextButton" android:layout_width="match_parent"
+                android:layout_height="48dp" android:text="@string/preview_sound"
+                app:icon="@android:drawable/ic_media_play" app:iconGravity="textStart" />
             <TextView android:id="@+id/volumeLabel" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:text="@string/volume_default" android:textColor="@color/navy" android:textStyle="bold" />
             <SeekBar android:id="@+id/volumeSeek" android:layout_width="match_parent" android:layout_height="wrap_content" android:max="100" android:progress="80" />
             <com.google.android.material.materialswitch.MaterialSwitch android:id="@+id/mathSwitch" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="@string/math_dismiss" />
@@ -30,7 +34,7 @@
             <com.google.android.material.materialswitch.MaterialSwitch android:id="@+id/keepSwitch" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/keep_one_time" />
             <com.google.android.material.materialswitch.MaterialSwitch android:id="@+id/gradualSwitch" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/gradual_volume" />
             <com.google.android.material.materialswitch.MaterialSwitch android:id="@+id/vibrateSwitch" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/vibrate" />
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="14dp" android:text="@string/auto_action_title" android:textColor="@color/navy" android:textStyle="bold" />
+            <TextView android:id="@+id/autoActionTitle" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="14dp" android:text="@string/auto_action_title" android:textColor="@color/navy" android:textStyle="bold" />
             <Spinner android:id="@+id/autoActionSpinner" android:layout_width="match_parent" android:layout_height="52dp" />
             <TextView android:id="@+id/autoAfterLabel" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/after_5_minutes" android:textColor="@color/slate" />
             <SeekBar android:id="@+id/autoAfterSeek" android:layout_width="match_parent" android:layout_height="wrap_content" android:max="29" android:progress="4" />
