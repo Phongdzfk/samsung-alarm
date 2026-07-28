@@ -33,6 +33,15 @@
                 android:textColor="@color/slate" android:textSize="17sp" android:visibility="gone" />
         </LinearLayout>
 
+        <androidx.core.widget.NestedScrollView android:id="@+id/paneWorldClock"
+            android:layout_width="match_parent" android:layout_height="match_parent"
+            android:clipToPadding="false" android:fillViewport="true"
+            android:paddingStart="16dp" android:paddingEnd="16dp" android:paddingBottom="20dp"
+            android:visibility="gone">
+            <LinearLayout android:id="@+id/worldClockList" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:orientation="vertical" />
+        </androidx.core.widget.NestedScrollView>
+
         <androidx.core.widget.NestedScrollView android:id="@+id/paneQuick" android:layout_width="match_parent"
             android:layout_height="match_parent" android:fillViewport="true" android:visibility="gone">
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="20dp">
@@ -74,6 +83,16 @@
             <SeekBar android:id="@+id/timerSeek" android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:layout_marginTop="28dp" android:max="120" android:progress="5" />
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/timer_range" android:textColor="@color/slate" />
+            <com.google.android.material.textfield.TextInputLayout android:id="@+id/timerMinutesLayout"
+                android:layout_width="220dp" android:layout_height="wrap_content"
+                android:layout_marginTop="18dp" android:hint="@string/timer_minutes_input"
+                app:boxBackgroundMode="outline" app:helperText="@string/timer_minutes_helper">
+                <com.google.android.material.textfield.TextInputEditText android:id="@+id/timerMinutesInput"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:digits="0123456789" android:imeOptions="actionDone"
+                    android:inputType="number" android:maxLength="5" android:maxLines="1"
+                    android:selectAllOnFocus="true" />
+            </com.google.android.material.textfield.TextInputLayout>
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:layout_marginTop="28dp">
                 <com.google.android.material.button.MaterialButton android:id="@+id/timerReset" style="@style/Widget.Material3.Button.TonalButton"
                     android:layout_width="120dp" android:layout_height="56dp" android:text="@string/reset" />
@@ -85,13 +104,24 @@
         <LinearLayout android:id="@+id/paneStopwatch" android:layout_width="match_parent" android:layout_height="match_parent"
             android:visibility="gone" android:orientation="vertical" android:gravity="center_horizontal" android:padding="24dp">
             <TextView android:id="@+id/stopwatchDisplay" android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:layout_marginTop="60dp" android:text="@string/stopwatch_zero" android:textColor="@color/navy" android:textSize="54sp" android:textStyle="bold" />
-            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:layout_marginTop="40dp">
+                android:layout_marginTop="28dp" android:text="@string/stopwatch_zero" android:textColor="@color/navy" android:textSize="54sp" android:textStyle="bold" />
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:layout_marginTop="28dp">
                 <com.google.android.material.button.MaterialButton android:id="@+id/stopwatchReset" style="@style/Widget.Material3.Button.TonalButton"
-                    android:layout_width="120dp" android:layout_height="56dp" android:text="@string/reset" />
+                    android:layout_width="0dp" android:layout_height="56dp" android:layout_weight="1" android:text="@string/reset" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/stopwatchFlag" style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="0dp" android:layout_height="56dp" android:layout_marginStart="8dp"
+                    android:layout_weight="1" android:enabled="false" android:text="@string/flag" />
                 <com.google.android.material.button.MaterialButton android:id="@+id/stopwatchStart"
-                    android:layout_width="120dp" android:layout_height="56dp" android:layout_marginStart="12dp" android:text="@string/start" />
+                    android:layout_width="0dp" android:layout_height="56dp" android:layout_marginStart="8dp"
+                    android:layout_weight="1" android:text="@string/start" />
             </LinearLayout>
+            <ScrollView android:layout_width="match_parent" android:layout_height="0dp"
+                android:layout_marginTop="20dp" android:layout_weight="1"
+                android:clipToPadding="false" android:fillViewport="true">
+                <LinearLayout android:id="@+id/stopwatchFlagList" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:orientation="vertical"
+                    android:paddingBottom="16dp" />
+            </ScrollView>
         </LinearLayout>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton android:id="@+id/addAlarm"
@@ -101,10 +131,11 @@
     </FrameLayout>
 
     <LinearLayout android:layout_width="match_parent" android:layout_height="70dp" android:background="@color/card"
-        android:gravity="center" android:orientation="horizontal" android:paddingHorizontal="8dp">
-        <com.google.android.material.button.MaterialButton android:id="@+id/navAlarm" style="@style/Widget.Material3.Button.TextButton" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:text="@string/nav_alarm" android:textAllCaps="false" android:textSize="11sp" app:icon="@android:drawable/ic_lock_idle_alarm" app:iconGravity="top" app:iconTint="@color/primary" />
-        <com.google.android.material.button.MaterialButton android:id="@+id/navQuick" style="@style/Widget.Material3.Button.TextButton" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:text="@string/nav_quick" android:textAllCaps="false" android:textSize="11sp" app:icon="@android:drawable/ic_media_ff" app:iconGravity="top" app:iconTint="@color/primary" />
-        <com.google.android.material.button.MaterialButton android:id="@+id/navTimer" style="@style/Widget.Material3.Button.TextButton" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:text="@string/nav_timer" android:textAllCaps="false" android:textSize="11sp" app:icon="@android:drawable/ic_menu_recent_history" app:iconGravity="top" app:iconTint="@color/primary" />
-        <com.google.android.material.button.MaterialButton android:id="@+id/navStopwatch" style="@style/Widget.Material3.Button.TextButton" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:text="@string/nav_stopwatch" android:textAllCaps="false" android:textSize="11sp" app:icon="@android:drawable/ic_media_play" app:iconGravity="top" app:iconTint="@color/primary" />
+        android:gravity="center" android:orientation="horizontal" android:paddingHorizontal="4dp">
+        <com.google.android.material.button.MaterialButton android:id="@+id/navAlarm" style="@style/Widget.Material3.Button.TextButton" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:minWidth="0dp" android:text="@string/nav_alarm" android:textAllCaps="false" android:textSize="10sp" app:icon="@android:drawable/ic_lock_idle_alarm" app:iconGravity="top" app:iconPadding="2dp" app:iconSize="20dp" app:iconTint="@color/primary" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/navWorldClock" style="@style/Widget.Material3.Button.TextButton" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:minWidth="0dp" android:text="@string/nav_world_clock" android:textAllCaps="false" android:textSize="10sp" app:icon="@android:drawable/ic_menu_compass" app:iconGravity="top" app:iconPadding="2dp" app:iconSize="20dp" app:iconTint="@color/primary" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/navQuick" style="@style/Widget.Material3.Button.TextButton" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:minWidth="0dp" android:text="@string/nav_quick" android:textAllCaps="false" android:textSize="10sp" app:icon="@android:drawable/ic_media_ff" app:iconGravity="top" app:iconPadding="2dp" app:iconSize="20dp" app:iconTint="@color/primary" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/navTimer" style="@style/Widget.Material3.Button.TextButton" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:minWidth="0dp" android:text="@string/nav_timer" android:textAllCaps="false" android:textSize="10sp" app:icon="@android:drawable/ic_menu_recent_history" app:iconGravity="top" app:iconPadding="2dp" app:iconSize="20dp" app:iconTint="@color/primary" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/navStopwatch" style="@style/Widget.Material3.Button.TextButton" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:minWidth="0dp" android:text="@string/nav_stopwatch" android:textAllCaps="false" android:textSize="10sp" app:icon="@android:drawable/ic_media_play" app:iconGravity="top" app:iconPadding="2dp" app:iconSize="20dp" app:iconTint="@color/primary" />
     </LinearLayout>
 </LinearLayout>

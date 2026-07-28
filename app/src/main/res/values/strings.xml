@@ -107,4 +107,36 @@
     <string name="preview_sound">Nghe thử âm báo</string>
     <string name="stop_preview">Dừng nghe thử</string>
     <string name="unable_to_play_sound">Không thể phát file âm thanh này</string>
+    <string name="world_clock">Đồng hồ thế giới</string>
+    <string name="nav_world_clock">Thế giới</string>
+    <string name="world_clock_subtitle">Giờ hiện tại tại các thành phố trên thế giới</string>
+    <string name="world_city_meta">%1$s · %2$s</string>
+    <string name="city_ho_chi_minh">TP. Hồ Chí Minh</string>
+    <string name="city_tokyo">Tokyo</string>
+    <string name="city_seoul">Seoul</string>
+    <string name="city_singapore">Singapore</string>
+    <string name="city_dubai">Dubai</string>
+    <string name="city_london">London</string>
+    <string name="city_paris">Paris</string>
+    <string name="city_new_york">New York</string>
+    <string name="city_los_angeles">Los Angeles</string>
+    <string name="city_sydney">Sydney</string>
+    <string name="country_vietnam">Việt Nam</string>
+    <string name="country_japan">Nhật Bản</string>
+    <string name="country_south_korea">Hàn Quốc</string>
+    <string name="country_singapore">Singapore</string>
+    <string name="country_uae">Các Tiểu vương quốc Ả Rập Thống nhất</string>
+    <string name="country_united_kingdom">Vương quốc Anh</string>
+    <string name="country_france">Pháp</string>
+    <string name="country_united_states">Hoa Kỳ</string>
+    <string name="country_australia">Úc</string>
+    <string name="world_time_preview" translatable="false">09:41</string>
+    <string name="world_date_preview" translatable="false">T3, 28/07</string>
+    <string name="world_city_meta_preview">Nhật Bản · UTC+09:00</string>
+    <string name="timer_minutes_input">Nhập số phút</string>
+    <string name="timer_minutes_helper">Từ 1 đến 10.080 phút</string>
+    <string name="timer_minutes_invalid">Hãy nhập từ 1 đến 10.080 phút</string>
+    <string name="flag">Mốc</string>
+    <string name="flag_number">Mốc %1$d</string>
+    <string name="flag_preview">Mốc 1</string>
 </resources>

@@ -40,7 +40,7 @@ public class EditAlarmActivity extends LocalizedActivity {
     private Alarm alarm;
     private TimePicker time;
     private TextInputEditText label;
-    private MaterialButton mon,tue,wed,thu,fri,sat,sun;
+    private MaterialButton everyDay,mon,tue,wed,thu,fri,sat,sun;
     private SeekBar volume,snooze,autoAfter;
     private TextView volumeLabel,snoozeLabel,autoAfterLabel,ringtoneButton,autoActionTitle;
     private MaterialButton previewRingtoneButton;
@@ -64,14 +64,17 @@ public class EditAlarmActivity extends LocalizedActivity {
     }
     private void bind() {
         time=findViewById(R.id.timePicker); time.setIs24HourView(true); label=findViewById(R.id.labelInput);
-        mon=findViewById(R.id.dayMon);tue=findViewById(R.id.dayTue);wed=findViewById(R.id.dayWed);thu=findViewById(R.id.dayThu);fri=findViewById(R.id.dayFri);sat=findViewById(R.id.daySat);sun=findViewById(R.id.daySun);
+        everyDay=findViewById(R.id.dayEvery);mon=findViewById(R.id.dayMon);tue=findViewById(R.id.dayTue);wed=findViewById(R.id.dayWed);thu=findViewById(R.id.dayThu);fri=findViewById(R.id.dayFri);sat=findViewById(R.id.daySat);sun=findViewById(R.id.daySun);
         volume=findViewById(R.id.volumeSeek);snooze=findViewById(R.id.snoozeSeek);autoAfter=findViewById(R.id.autoAfterSeek);
         volumeLabel=findViewById(R.id.volumeLabel);snoozeLabel=findViewById(R.id.snoozeLabel);autoAfterLabel=findViewById(R.id.autoAfterLabel);ringtoneButton=findViewById(R.id.ringtoneButton);autoActionTitle=findViewById(R.id.autoActionTitle);previewRingtoneButton=findViewById(R.id.previewRingtoneButton);
         math=findViewById(R.id.mathSwitch);keep=findViewById(R.id.keepSwitch);gradual=findViewById(R.id.gradualSwitch);vibrate=findViewById(R.id.vibrateSwitch);
         difficulty=findViewById(R.id.difficultySpinner);autoAction=findViewById(R.id.autoActionSpinner);
     }
     private void setup() {
-        mon.setCheckable(true);tue.setCheckable(true);wed.setCheckable(true);thu.setCheckable(true);fri.setCheckable(true);sat.setCheckable(true);sun.setCheckable(true);
+        everyDay.setCheckable(true);mon.setCheckable(true);tue.setCheckable(true);wed.setCheckable(true);thu.setCheckable(true);fri.setCheckable(true);sat.setCheckable(true);sun.setCheckable(true);
+        everyDay.setOnClickListener(view->setAllDays(everyDay.isChecked()));
+        MaterialButton.OnCheckedChangeListener dayListener=(button,checked)->syncEveryDayButton();
+        mon.addOnCheckedChangeListener(dayListener);tue.addOnCheckedChangeListener(dayListener);wed.addOnCheckedChangeListener(dayListener);thu.addOnCheckedChangeListener(dayListener);fri.addOnCheckedChangeListener(dayListener);sat.addOnCheckedChangeListener(dayListener);sun.addOnCheckedChangeListener(dayListener);
         difficulty.setAdapter(ArrayAdapter.createFromResource(this,R.array.math_difficulties,android.R.layout.simple_spinner_dropdown_item));
         autoAction.setAdapter(ArrayAdapter.createFromResource(this,R.array.auto_actions,android.R.layout.simple_spinner_dropdown_item));
         math.setOnCheckedChangeListener((button,checked)->updateMathControls(checked));
@@ -82,7 +85,7 @@ public class EditAlarmActivity extends LocalizedActivity {
         findViewById(R.id.backButton).setOnClickListener(v->finish()); findViewById(R.id.saveButton).setOnClickListener(v->save());
     }
     private void populate() {
-        time.setHour(alarm.hour);time.setMinute(alarm.minute);label.setText(alarm.label);mon.setChecked(alarm.mon);tue.setChecked(alarm.tue);wed.setChecked(alarm.wed);thu.setChecked(alarm.thu);fri.setChecked(alarm.fri);sat.setChecked(alarm.sat);sun.setChecked(alarm.sun);
+        time.setHour(alarm.hour);time.setMinute(alarm.minute);label.setText(alarm.label);mon.setChecked(alarm.mon);tue.setChecked(alarm.tue);wed.setChecked(alarm.wed);thu.setChecked(alarm.thu);fri.setChecked(alarm.fri);sat.setChecked(alarm.sat);sun.setChecked(alarm.sun);syncEveryDayButton();
         volume.setProgress(alarm.volume);difficulty.setSelection(Math.max(0,alarm.mathDifficulty-1));keep.setChecked(alarm.keepAfterDismiss);gradual.setChecked(alarm.gradualVolume);vibrate.setChecked(alarm.vibrate);
         autoAction.setSelection(alarm.autoAction);autoAfter.setProgress(Math.max(0,alarm.autoAfterMinutes-1));snooze.setProgress(Math.max(0,alarm.snoozeMinutes-1));
         math.setChecked(alarm.isMathDismiss);updateMathControls(alarm.isMathDismiss);
@@ -136,6 +139,13 @@ public class EditAlarmActivity extends LocalizedActivity {
         autoActionTitle.setVisibility(optionalVisibility);autoAction.setVisibility(optionalVisibility);
         autoAfterLabel.setVisibility(optionalVisibility);autoAfter.setVisibility(optionalVisibility);
         snoozeLabel.setVisibility(optionalVisibility);snooze.setVisibility(optionalVisibility);
+    }
+    private void setAllDays(boolean checked){
+        mon.setChecked(checked);tue.setChecked(checked);wed.setChecked(checked);thu.setChecked(checked);fri.setChecked(checked);sat.setChecked(checked);sun.setChecked(checked);
+        everyDay.setChecked(checked);
+    }
+    private void syncEveryDayButton(){
+        everyDay.setChecked(mon.isChecked()&&tue.isChecked()&&wed.isChecked()&&thu.isChecked()&&fri.isChecked()&&sat.isChecked()&&sun.isChecked());
     }
     private void save() {
         if(!AlarmScheduler.canScheduleExact(this)){if(Build.VERSION.SDK_INT>=31)startActivity(AlarmScheduler.exactAlarmPermissionIntent(this));return;}

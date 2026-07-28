@@ -13,6 +13,10 @@
                 <com.google.android.material.textfield.TextInputEditText android:id="@+id/labelInput" android:layout_width="match_parent" android:layout_height="wrap_content" android:maxLength="40" android:singleLine="true" />
             </com.google.android.material.textfield.TextInputLayout>
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="22dp" android:text="@string/repeat" android:textColor="@color/navy" android:textSize="17sp" android:textStyle="bold" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/dayEvery"
+                style="@style/Widget.SmartAlarm.DayButton" android:layout_width="match_parent"
+                android:layout_height="48dp" android:layout_marginTop="8dp"
+                android:text="@string/every_day" />
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:orientation="horizontal">
                 <com.google.android.material.button.MaterialButton android:id="@+id/dayMon" style="@style/Widget.SmartAlarm.DayButton" android:layout_width="0dp" android:layout_height="48dp" android:layout_weight="1" android:text="@string/day_mon" />
                 <com.google.android.material.button.MaterialButton android:id="@+id/dayTue" style="@style/Widget.SmartAlarm.DayButton" android:layout_width="0dp" android:layout_height="48dp" android:layout_weight="1" android:text="@string/day_tue" />
