@@ -26,6 +26,14 @@ public final class UpcomingNotificationManager {
     }
 
     public static void showAt(Context context, Alarm alarm, long triggerAtMillis) {
+        showAt(context,alarm,triggerAtMillis,false);
+    }
+
+    public static void showSnoozedAt(Context context, Alarm alarm, long triggerAtMillis) {
+        showAt(context,alarm,triggerAtMillis,true);
+    }
+
+    private static void showAt(Context context, Alarm alarm, long triggerAtMillis, boolean snoozed) {
         if(alarm==null||!alarm.isActive||triggerAtMillis<=System.currentTimeMillis())return;
         NotificationHelper.createChannels(context);
         PendingIntent open=PendingIntent.getActivity(context,alarm.id,new Intent(context,MainActivity.class),PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_IMMUTABLE);
@@ -34,7 +42,7 @@ public final class UpcomingNotificationManager {
         PendingIntent disable=PendingIntent.getBroadcast(context,DISABLE_OFFSET+alarm.id,disableIntent,PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_IMMUTABLE);
         String time=DateFormat.getTimeInstance(DateFormat.SHORT).format(new Date(triggerAtMillis));
         NotificationCompat.Builder notification=new NotificationCompat.Builder(context,NotificationHelper.UPCOMING_CHANNEL)
-                .setSmallIcon(android.R.drawable.ic_lock_idle_alarm).setContentTitle(context.getString(R.string.upcoming_persistent_title,time))
+                .setSmallIcon(android.R.drawable.ic_lock_idle_alarm).setContentTitle(context.getString(snoozed?R.string.snoozed_until_title:R.string.upcoming_persistent_title,time))
                 .setContentText(alarm.label).setContentIntent(open).setOngoing(true).setAutoCancel(false).setOnlyAlertOnce(true)
                 .setCategory(NotificationCompat.CATEGORY_ALARM).setPriority(NotificationCompat.PRIORITY_DEFAULT).setSilent(true)
                 .addAction(android.R.drawable.ic_menu_close_clear_cancel,context.getString(R.string.turn_off_alarm),disable);

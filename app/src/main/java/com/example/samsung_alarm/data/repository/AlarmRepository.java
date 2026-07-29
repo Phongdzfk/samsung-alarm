@@ -75,7 +75,7 @@ public final class AlarmRepository {
         long snoozeAt=System.currentTimeMillis()+minutes*60_000L;
         if(alarm!=null&&alarm.isQuickAlarm){alarm.triggerAtMillis=snoozeAt;Calendar trigger=Calendar.getInstance();trigger.setTimeInMillis(alarm.triggerAtMillis);alarm.hour=trigger.get(Calendar.HOUR_OF_DAY);alarm.minute=trigger.get(Calendar.MINUTE);dao.update(alarm);}
         AlarmScheduler.scheduleSnooze(context,id,minutes);
-        if(alarm!=null)UpcomingNotificationManager.showAt(context,alarm,snoozeAt);
+        if(alarm!=null)UpcomingNotificationManager.showSnoozedAt(context,alarm,snoozeAt);
     }
     public void rescheduleAll() {
         AppExecutors.DB.execute(() -> {

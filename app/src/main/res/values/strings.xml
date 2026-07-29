@@ -139,4 +139,5 @@
     <string name="flag">Mốc</string>
     <string name="flag_number">Mốc %1$d</string>
     <string name="flag_preview">Mốc 1</string>
+    <string name="snoozed_until_title">Đã hoãn đến %1$s</string>
 </resources>

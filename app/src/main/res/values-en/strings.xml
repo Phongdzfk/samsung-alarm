@@ -70,4 +70,5 @@
     <string name="flag">Flag</string>
     <string name="flag_number">Flag %1$d</string>
     <string name="flag_preview">Flag 1</string>
+    <string name="snoozed_until_title">Snoozed until %1$s</string>
 </resources>

@@ -79,13 +79,13 @@ public class AlarmRingingService extends Service {
         startForeground(42, builder.build());
         play(alarm);
 
-        if (alarm != null && alarm.autoAction != 0) {
+        if (alarm != null && !alarm.isMathDismiss && alarm.autoAction != 0) {
             autoAction = () -> {
-                if (alarm.autoAction == 1) AlarmScheduler.scheduleSnooze(this, id, alarm.snoozeMinutes);
-                else AppExecutors.DB.execute(() -> {
-                    if (!alarm.repeats() && !alarm.keepAfterDismiss) AlarmRepository.get(this).finishOneTimeSync(id);
-                });
-                stopSelf();
+                if (alarm.autoAction == 1) {
+                    AppExecutors.DB.execute(()->{try{AlarmRepository.get(this).snoozeSync(id,alarm.snoozeMinutes);}finally{stopSelf();}});
+                } else {
+                    AppExecutors.DB.execute(()->{try{if(!alarm.repeats()&&!alarm.keepAfterDismiss)AlarmRepository.get(this).finishOneTimeSync(id);}finally{stopSelf();}});
+                }
             };
             handler.postDelayed(autoAction, Math.max(1, alarm.autoAfterMinutes) * 60_000L);
         }

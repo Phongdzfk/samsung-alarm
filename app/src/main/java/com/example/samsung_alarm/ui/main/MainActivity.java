@@ -49,6 +49,7 @@ public class MainActivity extends LocalizedActivity implements AlarmAdapter.List
     private AlarmAdapter adapter;
     private QuickAlarmAdapter quickAdapter;
     private boolean fullScreenDialogShown;
+    private boolean exactPermissionGranted;
     private final Handler worldClockHandler=new Handler(Looper.getMainLooper());
     private final List<WorldClockRow> worldClockRows=new ArrayList<>();
     private final Runnable worldClockTick=new Runnable(){
@@ -76,7 +77,7 @@ public class MainActivity extends LocalizedActivity implements AlarmAdapter.List
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (view, insets) -> {
             Insets bars=insets.getInsets(WindowInsetsCompat.Type.systemBars()); view.setPadding(bars.left,bars.top,bars.right,bars.bottom); return insets;
         });
-        repository=AlarmRepository.get(this); bindViews(); setupAlarmList(); setupWorldClocks(); setupNavigation(); setupQuick();
+        repository=AlarmRepository.get(this);exactPermissionGranted=AlarmScheduler.canScheduleExact(this);bindViews(); setupAlarmList(); setupWorldClocks(); setupNavigation(); setupQuick();
         new TimerController(this, this::ensureExactPermission); new StopwatchController(this);
         addButton.setOnClickListener(v -> startActivity(new Intent(this, EditAlarmActivity.class)));
         findViewById(R.id.settingsButton).setOnClickListener(v -> showSettings()); requestNotificationPermission();
@@ -172,7 +173,12 @@ public class MainActivity extends LocalizedActivity implements AlarmAdapter.List
     @Override public void skipNext(Alarm alarm) { repository.toggleSkipNext(alarm); }
     private boolean ensureExactPermission() { if(AlarmScheduler.canScheduleExact(this))return true; if(Build.VERSION.SDK_INT>=31)startActivity(AlarmScheduler.exactAlarmPermissionIntent(this)); return false; }
     private void requestNotificationPermission() { if(Build.VERSION.SDK_INT>=33&&ActivityCompat.checkSelfPermission(this,Manifest.permission.POST_NOTIFICATIONS)!=PackageManager.PERMISSION_GRANTED)ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.POST_NOTIFICATIONS},200); }
-    @Override protected void onResume() { super.onResume();worldClockHandler.removeCallbacks(worldClockTick);worldClockHandler.post(worldClockTick);if(repository!=null&&AlarmScheduler.canScheduleExact(this))repository.rescheduleAll(); requestFullScreenPermissionIfNeeded(); }
+    @Override protected void onResume() {
+        super.onResume();worldClockHandler.removeCallbacks(worldClockTick);worldClockHandler.post(worldClockTick);
+        boolean canSchedule=AlarmScheduler.canScheduleExact(this);
+        if(repository!=null&&canSchedule&&!exactPermissionGranted)repository.rescheduleAll();
+        exactPermissionGranted=canSchedule;requestFullScreenPermissionIfNeeded();
+    }
     @Override protected void onPause(){worldClockHandler.removeCallbacks(worldClockTick);super.onPause();}
     private boolean canUseFullScreenAlarms(){if(Build.VERSION.SDK_INT<34)return true;NotificationManager manager=getSystemService(NotificationManager.class);return manager!=null&&manager.canUseFullScreenIntent();}
     private void requestFullScreenPermissionIfNeeded(){

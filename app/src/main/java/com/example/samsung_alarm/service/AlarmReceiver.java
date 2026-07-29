@@ -20,9 +20,11 @@ public class AlarmReceiver extends BroadcastReceiver {
             context.stopService(new Intent(context, AlarmRingingService.class));
             if (ACTION_SNOOZE.equals(intent.getAction())) {
                 int minutes = intent.getIntExtra("minutes", 5);
-                AppExecutors.DB.execute(() -> AlarmRepository.get(context).snoozeSync(id, minutes));
+                PendingResult result=goAsync();
+                AppExecutors.DB.execute(()->{try{AlarmRepository.get(context).snoozeSync(id,minutes);}finally{result.finish();}});
             } else if (id > 0) {
-                AppExecutors.DB.execute(() -> AlarmRepository.get(context).finishOneTimeSync(id));
+                PendingResult result=goAsync();
+                AppExecutors.DB.execute(()->{try{AlarmRepository.get(context).finishOneTimeSync(id);}finally{result.finish();}});
             }
             return;
         }
