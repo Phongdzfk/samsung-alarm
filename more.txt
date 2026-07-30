@@ -1,108 +1,114 @@
-private static void showAt(
-        Context context,
-        Alarm alarm,
-        long triggerAtMillis,
-        boolean snoozed
+if (ACTION_DISMISS.equals(intent.getAction())
+        || ACTION_SNOOZE.equals(intent.getAction())) {
+
+    context.stopService(
+            new Intent(context, AlarmRingingService.class)
+    );
+
+    if (ACTION_SNOOZE.equals(intent.getAction())) {
+        int minutes = intent.getIntExtra("minutes", 5);
+        PendingResult result = goAsync();
+
+        AppExecutors.DB.execute(() -> {
+            try {
+                AlarmRepository.get(context)
+                        .snoozeSync(id, minutes);
+            } finally {
+                result.finish();
+            }
+        });
+
+    } else if (id > 0) {
+        boolean dismissUpcoming =
+                intent.getBooleanExtra(
+                        EXTRA_DISMISS_UPCOMING,
+                        false
+                );
+
+        long triggerAtMillis =
+                intent.getLongExtra(
+                        EXTRA_DISMISS_TRIGGER_AT,
+                        0L
+                );
+
+        PendingResult result = goAsync();
+
+        AppExecutors.DB.execute(() -> {
+            try {
+                if (dismissUpcoming) {
+                    AlarmRepository.get(context)
+                            .dismissUpcomingSync(
+                                    id,
+                                    triggerAtMillis
+                            );
+                } else {
+                    /*
+                     * Dismiss từ RingActivity.
+                     * Giữ nguyên hành vi hiện tại.
+                     */
+                    AlarmRepository.get(context)
+                            .finishOneTimeSync(id);
+                }
+            } finally {
+                result.finish();
+            }
+        });
+    }
+
+    return;
+}
+
+
+
+public void dismissUpcomingSync(
+        int id,
+        long triggerAtMillis
 ) {
-    if (alarm == null
-            || !alarm.isActive
-            || triggerAtMillis <= System.currentTimeMillis()) {
+    Alarm alarm = dao.getById(id);
+
+    if (alarm == null) {
         return;
     }
 
-    NotificationHelper.createChannels(context);
+    /*
+     * Hủy lần báo thức hiện đang được lên lịch,
+     * bao gồm cả notification upcoming.
+     */
+    AlarmScheduler.cancel(context, id);
+    UpcomingNotificationManager.cancel(context, id);
 
-    PendingIntent open = PendingIntent.getActivity(
-            context,
-            alarm.id,
-            new Intent(context, MainActivity.class),
-            PendingIntent.FLAG_UPDATE_CURRENT
-                    | PendingIntent.FLAG_IMMUTABLE
-    );
+    /*
+     * triggerAtMillis chính là occurrence mà notification
+     * đang đại diện. Lưu nó vào skipUntilMillis để scheduler
+     * bỏ qua đúng lần này.
+     */
+    long dismissedTrigger =
+            triggerAtMillis > 0
+                    ? triggerAtMillis
+                    : AlarmScheduler
+                            .nextTriggerIgnoringSkip(alarm);
 
-    Intent dismissIntent = new Intent(
-            context,
-            AlarmReceiver.class
-    )
-            .setAction(AlarmReceiver.ACTION_DISMISS)
-            .putExtra(
-                    AlarmScheduler.EXTRA_ALARM_ID,
-                    alarm.id
-            )
-            .putExtra(
-                    AlarmReceiver.EXTRA_DISMISS_UPCOMING,
-                    true
-            )
-            .putExtra(
-                    AlarmReceiver.EXTRA_DISMISS_TRIGGER_AT,
-                    triggerAtMillis
-            );
+    alarm.skipUntilMillis = dismissedTrigger;
 
-    PendingIntent dismiss = PendingIntent.getBroadcast(
-            context,
-            DISMISS_OFFSET + alarm.id,
-            dismissIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT
-                    | PendingIntent.FLAG_IMMUTABLE
-    );
+    /*
+     * Báo thức một lần và không giữ lại:
+     * chỉ chuyển inactive, không lên lịch lại.
+     */
+    if (!alarm.repeats()
+            && !alarm.keepAfterDismiss) {
 
-    String time = DateFormat.getTimeInstance(
-            DateFormat.SHORT
-    ).format(new Date(triggerAtMillis));
-
-    NotificationCompat.Builder notification =
-            new NotificationCompat.Builder(
-                    context,
-                    NotificationHelper.UPCOMING_CHANNEL
-            )
-                    .setSmallIcon(
-                            android.R.drawable.ic_lock_idle_alarm
-                    )
-                    .setContentTitle(
-                            context.getString(
-                                    snoozed
-                                            ? R.string.snoozed_until_title
-                                            : R.string.upcoming_persistent_title,
-                                    time
-                            )
-                    )
-                    .setContentText(alarm.label)
-                    .setContentIntent(open)
-                    .setOngoing(true)
-                    .setAutoCancel(false)
-                    .setOnlyAlertOnce(true)
-                    .setCategory(
-                            NotificationCompat.CATEGORY_ALARM
-                    )
-                    .setPriority(
-                            NotificationCompat.PRIORITY_DEFAULT
-                    )
-                    .setSilent(true)
-                    .addAction(
-                            android.R.drawable
-                                    .ic_menu_close_clear_cancel,
-                            context.getString(R.string.dismiss),
-                            dismiss
-                    );
-
-    long remaining =
-            triggerAtMillis - System.currentTimeMillis();
-
-    if (remaining > 0) {
-        notification.setTimeoutAfter(remaining);
+        alarm.isActive = false;
+        dao.update(alarm);
+        return;
     }
 
-    if (Build.VERSION.SDK_INT < 33
-            || ContextCompat.checkSelfPermission(
-                    context,
-                    Manifest.permission.POST_NOTIFICATIONS
-            ) == PackageManager.PERMISSION_GRANTED) {
+    /*
+     * Báo thức lặp hoặc báo thức một lần có keepAfterDismiss:
+     * vẫn giữ active và lên lịch occurrence tiếp theo.
+     */
+    dao.update(alarm);
 
-        context.getSystemService(
-                NotificationManager.class
-        ).notify(
-                NOTIFICATION_OFFSET + alarm.id,
-                notification.build()
-        );
+    if (alarm.isActive) {
+        AlarmScheduler.schedule(context, alarm);
     }
 }
