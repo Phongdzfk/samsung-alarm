@@ -1,355 +1,57 @@
-Trong phần của bạn, các loại `View` được sử dụng như sau.
-
-# 1. `activity_main.xml`
-
-File: [activity_main.xml](C:/Users/24hph/AndroidStudioProjects/samsung_alarm/app/src/main/res/layout/activity_main.xml)
-
-## View tổng thể
-
-| View | Vai trò |
-|---|---|
-| `LinearLayout` | Root layout, header, nhóm nút và thanh navigation |
-| `FrameLayout` | Chứa các pane chức năng chồng lên nhau |
-| `TextView` | Tiêu đề, mô tả, thời gian |
-| `ImageButton` | Nút Settings |
-| `FloatingActionButton` | Nút thêm báo thức |
-| `MaterialButton` | Các nút chức năng và navigation |
-| `NestedScrollView` | Cuộn World Clock và Quick Alarm |
-| `RecyclerView` | Danh sách báo thức và Quick Alarm |
-| `SeekBar` | Chọn số phút Timer |
-| `TextInputLayout` | Khung nhập liệu Material |
-| `TextInputEditText` | Nhập số phút |
-| `MaterialSwitch` | Bật giải toán cho Quick Alarm |
-| `ScrollView` | Cuộn danh sách flag của Stopwatch |
-
-## Cấu trúc chính
-
-```text
-LinearLayout root
-├── LinearLayout header
-├── FrameLayout content
-│   ├── paneAlarms
-│   ├── paneWorldClock
-│   ├── paneQuick
-│   ├── paneTimer
-│   ├── paneStopwatch
-│   └── FloatingActionButton
-└── LinearLayout bottom navigation
-```
-
-`FrameLayout` phù hợp ở đây vì các pane nằm chồng cùng vị trí. Java chỉ cho một pane `VISIBLE`, các pane còn lại là `GONE`.
-
----
-
-# 2. World Clock layout
-
-## Trong `activity_main.xml`
-
-```xml
-<NestedScrollView android:id="@+id/paneWorldClock">
-    <LinearLayout android:id="@+id/worldClockList"/>
-</NestedScrollView>
-```
-
-### `NestedScrollView`
-
-Dùng để cuộn danh sách thành phố theo chiều dọc.
-
-Nó chỉ được có một View con trực tiếp, nên bên trong là một `LinearLayout`.
-
-### `LinearLayout`
-
-`worldClockList` là nơi Java thêm lần lượt các `item_world_clock`.
-
-Danh sách chỉ có 10 thành phố cố định nên dùng `LinearLayout`, không bắt buộc dùng RecyclerView.
-
-## `item_world_clock.xml`
-
-File: [item_world_clock.xml](C:/Users/24hph/AndroidStudioProjects/samsung_alarm/app/src/main/res/layout/item_world_clock.xml)
-
-Các View:
-
-| View | ID | Vai trò |
-|---|---|---|
-| `LinearLayout` | Root | Card của một thành phố |
-| `LinearLayout` | Không có ID | Cột tên thành phố và quốc gia |
-| `TextView` | `worldCityName` | Tên thành phố |
-| `TextView` | `worldCityMeta` | Quốc gia và UTC offset |
-| `LinearLayout` | Không có ID | Cột giờ và ngày |
-| `TextView` | `worldCityTime` | Giờ hiện tại |
-| `TextView` | `worldCityDate` | Thứ và ngày |
-
-Cấu trúc:
-
-```text
-LinearLayout ngang
-├── LinearLayout dọc, weight=1
-│   ├── TextView tên thành phố
-│   └── TextView quốc gia · UTC
-└── LinearLayout dọc
-    ├── TextView giờ
-    └── TextView ngày
-```
-
-`layout_weight=1` ở cột trái giúp đẩy cột giờ sang sát phải.
-
----
-
-# 3. Quick Alarm layout
-
-## Trong `activity_main.xml`
-
-Pane Quick Alarm sử dụng:
-
-| View | Công dụng |
-|---|---|
-| `NestedScrollView` | Cuộn toàn bộ màn Quick Alarm |
-| `LinearLayout` | Xếp các thành phần theo chiều dọc |
-| `TextView` | Tiêu đề, mô tả và tiêu đề danh sách |
-| `MaterialButton` | Các nút 5, 10, 15, 30 phút và nút đặt |
-| `TextInputLayout` | Bao ngoài ô nhập phút |
-| `TextInputEditText` | Nhập số phút tùy chỉnh |
-| `MaterialSwitch` | Bật giải toán |
-| `RecyclerView` | Hiển thị toàn bộ Quick Alarm |
-| `TextView` | Thông báo danh sách rỗng |
-
-### Tại sao dùng `NestedScrollView`?
-
-Vì màn Quick Alarm không chỉ có danh sách mà còn có nhiều nút và ô nhập ở phía trên. Người dùng cần cuộn toàn bộ nội dung.
-
-### Tại sao vẫn dùng RecyclerView bên trong?
-
-Vì số lượng Quick Alarm thay đổi động. Mỗi báo thức cần một item riêng, có nút xóa riêng.
-
-RecyclerView được đặt:
-
-```xml
-android:nestedScrollingEnabled="false"
-```
-
-để `NestedScrollView` xử lý việc cuộn chính.
-
-## `item_quick_alarm.xml`
-
-File: [item_quick_alarm.xml](C:/Users/24hph/AndroidStudioProjects/samsung_alarm/app/src/main/res/layout/item_quick_alarm.xml)
-
-Các View:
-
-| View | ID | Vai trò |
-|---|---|---|
-| `LinearLayout` | Root | Card Quick Alarm |
-| `ImageView` | Không có ID | Icon báo thức |
-| `LinearLayout` | Không có ID | Nhóm tên và thông tin |
-| `TextView` | `quickItemTitle` | Tên Quick Alarm |
-| `TextView` | `quickItemDetail` | Giờ reo và số phút còn lại |
-| `ImageButton` | `quickItemDelete` | Xóa Quick Alarm |
-
-Cấu trúc:
-
-```text
-LinearLayout ngang
-├── ImageView icon
-├── LinearLayout dọc, weight=1
-│   ├── TextView tiêu đề
-│   └── TextView chi tiết
-└── ImageButton xóa
-```
-
-Phần giữa có `layout_weight=1`, vì vậy nút xóa luôn được giữ ở sát phải.
-
----
-
-# 4. Timer layout
-
-Timer nằm trực tiếp trong `activity_main.xml`.
-
-Các View:
-
-| View | ID | Vai trò |
-|---|---|---|
-| `LinearLayout` | `paneTimer` | Container chính |
-| `TextView` | `timerDisplay` | Thời gian còn lại |
-| `SeekBar` | `timerSeek` | Chọn nhanh 1–120 phút |
-| `TextView` | Không có ID | Hướng dẫn phạm vi SeekBar |
-| `TextInputLayout` | `timerMinutesLayout` | Khung nhập và hiện lỗi |
-| `TextInputEditText` | `timerMinutesInput` | Nhập 1–10.080 phút |
-| `LinearLayout` | Không có ID | Nhóm nút |
-| `MaterialButton` | `timerReset` | Reset Timer |
-| `MaterialButton` | `timerStart` | Start/Pause/Resume |
-
-Cấu trúc:
-
-```text
-LinearLayout dọc
-├── TextView timerDisplay
-├── SeekBar timerSeek
-├── TextView hướng dẫn
-├── TextInputLayout
-│   └── TextInputEditText
-└── LinearLayout ngang
-    ├── MaterialButton Reset
-    └── MaterialButton Start
-```
-
-### Vì sao dùng `TextInputLayout`?
-
-`TextInputLayout` cung cấp:
-
-- Viền Material Design.
-- Floating hint.
-- Helper text.
-- Hiển thị lỗi qua `setError()`.
-
-`TextInputEditText` là ô nhập thực tế bên trong.
-
-### Vì sao dùng `SeekBar`?
-
-Nó giúp chọn nhanh khoảng thời gian thường dùng. Nhưng vì SeekBar chỉ tối đa 120 phút nên ô nhập tay hỗ trợ đến 10.080 phút.
-
----
-
-# 5. Stopwatch layout
-
-Stopwatch cũng nằm trong `activity_main.xml`.
-
-Các View:
-
-| View | ID | Vai trò |
-|---|---|---|
-| `LinearLayout` | `paneStopwatch` | Container chính |
-| `TextView` | `stopwatchDisplay` | Thời gian đã chạy |
-| `LinearLayout` | Không có ID | Nhóm ba nút |
-| `MaterialButton` | `stopwatchReset` | Reset |
-| `MaterialButton` | `stopwatchFlag` | Lưu mốc |
-| `MaterialButton` | `stopwatchStart` | Start/Pause/Resume |
-| `ScrollView` | Không có ID | Cuộn danh sách flag |
-| `LinearLayout` | `stopwatchFlagList` | Chứa các item flag |
-
-Cấu trúc:
-
-```text
-LinearLayout dọc
-├── TextView stopwatchDisplay
-├── LinearLayout ngang
-│   ├── MaterialButton Reset
-│   ├── MaterialButton Flag
-│   └── MaterialButton Start
-└── ScrollView
-    └── LinearLayout stopwatchFlagList
-```
-
-Không dùng RecyclerView cho flag. Mỗi lần nhấn Flag, Java inflate một `item_stopwatch_flag` rồi thêm trực tiếp vào `LinearLayout`.
-
-Cách này đơn giản với số lượng flag nhỏ. Nếu có hàng trăm hoặc hàng nghìn flag thì RecyclerView sẽ hiệu quả hơn.
-
-## `item_stopwatch_flag.xml`
-
-File: [item_stopwatch_flag.xml](C:/Users/24hph/AndroidStudioProjects/samsung_alarm/app/src/main/res/layout/item_stopwatch_flag.xml)
-
-Các View:
-
-| View | ID | Vai trò |
-|---|---|---|
-| `LinearLayout` | Root | Một dòng flag |
-| `TextView` | `stopwatchFlagNumber` | “Mốc 1”, “Mốc 2”... |
-| `TextView` | `stopwatchFlagTime` | Thời gian tại mốc |
-
-Cấu trúc:
-
-```text
-LinearLayout ngang
-├── TextView số mốc, weight=1
-└── TextView thời gian
-```
-
----
-
-# 6. Alarm item layout
-
-## `item_alarm.xml`
-
-File: [item_alarm.xml](C:/Users/24hph/AndroidStudioProjects/samsung_alarm/app/src/main/res/layout/item_alarm.xml)
-
-Layout này được `AlarmAdapter` inflate cho RecyclerView báo thức thường.
-
-Các View:
-
-| View | ID | Vai trò |
-|---|---|---|
-| `LinearLayout` | Root | Card báo thức |
-| `LinearLayout` | `itemContent` | Nội dung có thể nhấn để sửa |
-| `TextView` | `itemTime` | Giờ báo thức |
-| `TextView` | `itemLabel` | Tên báo thức |
-| `TextView` | `itemDays` | Ngày lặp |
-| `TextView` | `itemRemaining` | Còn bao lâu sẽ reo |
-| `MaterialSwitch` | `itemSwitch` | Bật/tắt |
-| `ImageButton` | `itemSkip` | Bỏ qua lần kế tiếp |
-| `ImageButton` | `itemDelete` | Xóa báo thức |
-
-Các nút `ImageButton` sử dụng:
-
-```xml
-android:background="?attr/selectableItemBackgroundBorderless"
-```
-
-để có hiệu ứng ripple tròn khi nhấn mà không có nền nút vuông.
-
----
-
-# 7. Bottom navigation
-
-Ở cuối `activity_main.xml`, navigation sử dụng một `LinearLayout` ngang chứa năm `MaterialButton`:
-
-- `navAlarm`.
-- `navWorldClock`.
-- `navQuick`.
-- `navTimer`.
-- `navStopwatch`.
-
-Mỗi nút có:
-
-```xml
-android:layout_width="0dp"
-android:layout_weight="1"
-```
-
-Năm nút chia đều chiều rộng màn hình.
-
-Icon đặt phía trên chữ bằng:
-
-```xml
-app:iconGravity="top"
-```
-
-Đây là navigation tự xây dựng bằng MaterialButton, không sử dụng `BottomNavigationView`.
-
----
-
-# 8. Phân biệt các View dễ bị hỏi
-
-| View | Khi nào dùng trong dự án |
-|---|---|
-| `View` | Lớp cơ sở của mọi thành phần giao diện |
-| `TextView` | Chỉ hiển thị chữ/thời gian |
-| `TextInputEditText` | Cho người dùng nhập dữ liệu |
-| `TextInputLayout` | Bao ngoài EditText để có hint và error |
-| `Button` | Nút cơ bản; Java khai báo kiểu cha cho MaterialButton |
-| `MaterialButton` | Nút Material hiện đại |
-| `ImageButton` | Nút chỉ có icon và nhận click |
-| `ImageView` | Chỉ hiển thị icon, không dùng như nút |
-| `MaterialSwitch` | Trạng thái bật/tắt |
-| `SeekBar` | Chọn giá trị liên tục |
-| `LinearLayout` | Sắp xếp View ngang hoặc dọc |
-| `FrameLayout` | Chứa các pane chồng lên cùng vị trí |
-| `ScrollView` | Cuộn một View con |
-| `NestedScrollView` | Cuộn tốt hơn khi có View cuộn lồng nhau |
-| `RecyclerView` | Danh sách động, tái sử dụng item |
-| `FloatingActionButton` | Hành động chính: thêm báo thức |
-
-Điểm quan trọng nhất để trình bày là:
-
-- World Clock dùng `NestedScrollView + LinearLayout` vì chỉ có 10 thành phố cố định.
-- Quick Alarm dùng `RecyclerView` vì danh sách thay đổi động và có thể có nhiều item.
-- Stopwatch flag dùng `ScrollView + LinearLayout` vì triển khai đơn giản, số mốc dự kiến nhỏ.
-- Các pane dùng `FrameLayout` để ẩn/hiện trên cùng một vùng nội dung.
-- Timer dùng cả `SeekBar` và `TextInputEditText` để vừa chọn nhanh vừa nhập được thời gian dài.
+    private void startRinging(int id, String label, Alarm alarm) {
+        Intent full = new Intent(this, RingActivity.class).putExtra(AlarmScheduler.EXTRA_ALARM_ID, id)
+                .putExtra(AlarmScheduler.EXTRA_MATH_DISMISS, alarm != null && alarm.isMathDismiss)
+                .putExtra(AlarmScheduler.EXTRA_MATH_DIFFICULTY, alarm == null ? 1 : alarm.mathDifficulty)
+                .putExtra(AlarmScheduler.EXTRA_LABEL, label)
+                .putExtra(AlarmScheduler.EXTRA_HOUR, alarm == null ? -1 : alarm.hour)
+                .putExtra(AlarmScheduler.EXTRA_MINUTE, alarm == null ? -1 : alarm.minute)
+                .putExtra(AlarmScheduler.EXTRA_SNOOZE_MINUTES, alarm == null ? 5 : alarm.snoozeMinutes)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent fullScreen = PendingIntent.getActivity(this, id, full,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        Intent dismissIntent = new Intent(this, AlarmReceiver.class).setAction(AlarmReceiver.ACTION_DISMISS)
+                .putExtra(AlarmScheduler.EXTRA_ALARM_ID, id);
+        Intent snoozeIntent = new Intent(this, AlarmReceiver.class).setAction(AlarmReceiver.ACTION_SNOOZE)
+                .putExtra(AlarmScheduler.EXTRA_ALARM_ID, id).putExtra("minutes", alarm == null ? 5 : alarm.snoozeMinutes);
+        PendingIntent dismiss = PendingIntent.getBroadcast(this, 300000 + Math.max(id, 0), dismissIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        PendingIntent snooze = PendingIntent.getBroadcast(this, 400000 + Math.max(id, 0), snoozeIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NotificationHelper.ALARM_CHANNEL)
+                .setSmallIcon(android.R.drawable.ic_lock_idle_alarm).setContentTitle(getString(R.string.ringing_title))
+                .setContentText(label).setCategory(NotificationCompat.CATEGORY_ALARM)
+                .setPriority(NotificationCompat.PRIORITY_MAX).setOngoing(true)
+                .setContentIntent(fullScreen);
+        builder.setFullScreenIntent(fullScreen, true);
+        // Chế độ giải toán buộc người dùng mở màn hình báo thức, không cho tắt hoặc snooze từ notification.
+        if (alarm == null || !alarm.isMathDismiss) {
+            builder.addAction(android.R.drawable.ic_media_pause, getString(R.string.snooze), snooze);
+            builder.addAction(android.R.drawable.ic_menu_close_clear_cancel, getString(R.string.dismiss), dismiss);
+        }
+        startForeground(42, builder.build());
+        play(alarm);
+
+        if (alarm != null && !alarm.isMathDismiss && alarm.autoAction != 0) {
+            autoAction = () -> {
+                if (alarm.autoAction == 1) {
+                    AppExecutors.DB.execute(() -> {
+                        try {
+                            AlarmRepository.get(this).snoozeSync(id, alarm.snoozeMinutes);
+                        } finally {
+                            stopSelf();
+                        }
+                    });
+                } else {
+                    AppExecutors.DB.execute(() -> {
+                        try {
+                            if (!alarm.repeats() && !alarm.keepAfterDismiss)
+                                AlarmRepository.get(this).finishOneTimeSync(id);
+                        } finally {
+                            stopSelf();
+                        }
+                    });
+                }
+            };
+            handler.postDelayed(autoAction, Math.max(1, alarm.autoAfterMinutes) * 60_000L);
+        }
+    }
