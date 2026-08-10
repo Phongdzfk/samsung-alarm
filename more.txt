@@ -1,114 +1,216 @@
-if (ACTION_DISMISS.equals(intent.getAction())
-        || ACTION_SNOOZE.equals(intent.getAction())) {
-
-    context.stopService(
-            new Intent(context, AlarmRingingService.class)
-    );
-
-    if (ACTION_SNOOZE.equals(intent.getAction())) {
-        int minutes = intent.getIntExtra("minutes", 5);
-        PendingResult result = goAsync();
-
-        AppExecutors.DB.execute(() -> {
-            try {
-                AlarmRepository.get(context)
-                        .snoozeSync(id, minutes);
-            } finally {
-                result.finish();
-            }
-        });
-
-    } else if (id > 0) {
-        boolean dismissUpcoming =
-                intent.getBooleanExtra(
-                        EXTRA_DISMISS_UPCOMING,
-                        false
-                );
-
-        long triggerAtMillis =
-                intent.getLongExtra(
-                        EXTRA_DISMISS_TRIGGER_AT,
-                        0L
-                );
-
-        PendingResult result = goAsync();
-
-        AppExecutors.DB.execute(() -> {
-            try {
-                if (dismissUpcoming) {
-                    AlarmRepository.get(context)
-                            .dismissUpcomingSync(
-                                    id,
-                                    triggerAtMillis
-                            );
-                } else {
-                    /*
-                     * Dismiss từ RingActivity.
-                     * Giữ nguyên hành vi hiện tại.
-                     */
-                    AlarmRepository.get(context)
-                            .finishOneTimeSync(id);
-                }
-            } finally {
-                result.finish();
-            }
-        });
-    }
-
-    return;
+#include<iostream>
+using namespace std;
+int n,m;
+int a[1005][1005] = {};
+int check;
+int v[1005][1005] = {};
+int d1[8] = {0,0,1,-1,1,-1,1,-1};
+int d2[8] = {1,-1,0,0,1,-1,-1,1};
+struct point{
+	int a;
+	int b;
+};
+point q[1000005];
+int front = 0;
+int rear = -1;
+void push(point z)
+{
+	q[++rear] = z;
+}
+point pop()
+{
+	return q[front++];
+}
+bool empty()
+{
+	return front > rear;
+}
+void bfs()
+{
+	while (!empty())
+	{
+		point x = pop();
+		v[x.a][x.b] = 1;
+		for (int i = 0; i < 8; i++)
+		{
+			int x1 = x.a+d1[i];
+			int x2 = x.b+d2[i];
+			if (x1 < 0 || x1 >=n || x2 < 0 || x2 >= m) continue;
+			if (v[x1][x2])
+			{
+				if (a[x1][x2] >= a[x.a][x.b])
+				{
+					check = 0;
+				}
+				else continue;
+			}
+			if (a[x1][x2] > a[x.a][x.b])
+			{
+				check = 0;
+			}
+			if (a[x1][x2] == a[x.a][x.b])
+			{
+				point tmp;
+				tmp.a = x1;
+				tmp.b = x2;
+				push(tmp);
+			}
+			if (a[x1][x2] < a[x.a][x.b])
+			{
+				v[x1][x2] = 1;
+			}
+		}
+	}
+	return;
+}
+int main()
+{
+	int t;
+	cin>>t;
+	for(int test_case = 1; test_case <= t; ++test_case)
+	{
+		int cnt = 0;
+		front = 0;
+		rear = -1;
+		cin>>n>>m;
+		for (int i = 0; i < n; i++)
+		{
+			for (int j = 0; j < m; j++)
+			{
+				cin>>a[i][j];
+				v[i][j] = 0;
+			}
+		}
+		for (int i = 0; i < n; i++)
+		{
+			for (int j = 0; j < m; j++)
+			{
+				if (!v[i][j])
+				{
+					point z;
+					z.a = i;
+					z.b = j;
+					push(z);
+					check = 1;
+					bfs();
+					if (check)
+					{
+						cnt++;
+					}
+					front = 0;
+					rear = -1;
+				}
+			}
+		}
+		cout<<"#"<<test_case<<" "<<cnt<<endl;
+	}
+	return 0;
 }
 
 
 
-public void dismissUpcomingSync(
-        int id,
-        long triggerAtMillis
-) {
-    Alarm alarm = dao.getById(id);
 
-    if (alarm == null) {
-        return;
-    }
-
-    /*
-     * Hủy lần báo thức hiện đang được lên lịch,
-     * bao gồm cả notification upcoming.
-     */
-    AlarmScheduler.cancel(context, id);
-    UpcomingNotificationManager.cancel(context, id);
-
-    /*
-     * triggerAtMillis chính là occurrence mà notification
-     * đang đại diện. Lưu nó vào skipUntilMillis để scheduler
-     * bỏ qua đúng lần này.
-     */
-    long dismissedTrigger =
-            triggerAtMillis > 0
-                    ? triggerAtMillis
-                    : AlarmScheduler
-                            .nextTriggerIgnoringSkip(alarm);
-
-    alarm.skipUntilMillis = dismissedTrigger;
-
-    /*
-     * Báo thức một lần và không giữ lại:
-     * chỉ chuyển inactive, không lên lịch lại.
-     */
-    if (!alarm.repeats()
-            && !alarm.keepAfterDismiss) {
-
-        alarm.isActive = false;
-        dao.update(alarm);
-        return;
-    }
-
-    /*
-     * Báo thức lặp hoặc báo thức một lần có keepAfterDismiss:
-     * vẫn giữ active và lên lịch occurrence tiếp theo.
-     */
-    dao.update(alarm);
-
-    if (alarm.isActive) {
-        AlarmScheduler.schedule(context, alarm);
-    }
+#include<iostream>
+using namespace std;
+int n,m;
+int a[1005][1005] = {};
+int check;
+int v[1005][1005] = {};
+int d1[8] = {0,0,1,-1,1,-1,1,-1};
+int d2[8] = {1,-1,0,0,1,-1,-1,1};
+struct point{
+	int a;
+	int b;
+};
+point q[1000005];
+int front = 0;
+int rear = -1;
+void push(point z)
+{
+	q[++rear] = z;
+}
+point pop()
+{
+	return q[front++];
+}
+bool empty()
+{
+	return front > rear;
+}
+void bfs()
+{
+	while (!empty())
+	{
+		point x = pop();
+		v[x.a][x.b] = 1;
+		for (int i = 0; i < 8; i++)
+		{
+			int x1 = x.a+d1[i];
+			int x2 = x.b+d2[i];
+			if (x1 < 0 || x1 >=n || x2 < 0 || x2 >= m) continue;
+			if (v[x1][x2])
+			{
+				if (a[x1][x2] > a[x.a][x.b])
+				{
+					check = 0;
+				}
+				else continue;
+			}
+			if (a[x1][x2] > a[x.a][x.b])
+			{
+				check = 0;
+			}
+			if (a[x1][x2] == a[x.a][x.b])
+			{
+				point tmp;
+				tmp.a = x1;
+				tmp.b = x2;
+				push(tmp);
+			}
+		}
+	}
+	return;
+}
+int main()
+{
+	int t;
+	cin>>t;
+	for(int test_case = 1; test_case <= t; ++test_case)
+	{
+		int cnt = 0;
+		front = 0;
+		rear = -1;
+		cin>>n>>m;
+		for (int i = 0; i < n; i++)
+		{
+			for (int j = 0; j < m; j++)
+			{
+				cin>>a[i][j];
+				v[i][j] = 0;
+			}
+		}
+		for (int i = 0; i < n; i++)
+		{
+			for (int j = 0; j < m; j++)
+			{
+				if (!v[i][j])
+				{
+					point z;
+					z.a = i;
+					z.b = j;
+					push(z);
+					check = 1;
+					bfs();
+					if (check)
+					{
+						cnt++;
+					}
+					front = 0;
+					rear = -1;
+				}
+			}
+		}
+		cout<<"#"<<test_case<<" "<<cnt<<endl;
+	}
+	return 0;
 }
