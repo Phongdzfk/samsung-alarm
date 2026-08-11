@@ -1,121 +1,29 @@
-#include<iostream>
-using namespace std;
-int n,m;
-int st,ed;
-int a[305][305] = {};
-int dis[305][305] = {};
-int v[305][305] = {};
-int d1[4] = {0,0,1,-1};
-int d2[4] = {1,-1,0,0};
+﻿You are making “sky map” to represent constellation (group of starts) in the sky.
 
-// ---- min-heap thủ công (lazy deletion) ----
-struct Node { int dist, i, j; };
-Node heap[400005];
-int heapSize = 0;
+In each element, 1 means star, 0 means empty.
 
-void heapPush(int dist, int i, int j)
-{
-	heap[++heapSize] = {dist, i, j};
-	int c = heapSize;
-	while (c > 1)
-	{
-		int p = c / 2;
-		if (heap[p].dist <= heap[c].dist) break;
-		Node tmp = heap[p]; heap[p] = heap[c]; heap[c] = tmp;
-		c = p;
-	}
-}
+And in a constellation, each start should have at least one connection with others via left/right/up/bottom. 
 
-Node heapPop()
-{
-	Node top = heap[1];
-	heap[1] = heap[heapSize--];
-	int p = 1;
-	while (true)
-	{
-		int l = p*2, r = p*2+1, small = p;
-		if (l <= heapSize && heap[l].dist < heap[small].dist) small = l;
-		if (r <= heapSize && heap[r].dist < heap[small].dist) small = r;
-		if (small == p) break;
-		Node tmp = heap[p]; heap[p] = heap[small]; heap[small] = tmp;
-		p = small;
-	}
-	return top;
-}
-// --------------------------------------------
+If two starts are located via diagonal, then
 
-void djk(int si,int sj)
-{
-	heapSize = 0;
-	for (int i = 0; i < 4; i++)
-	{
-		int xi = si + d1[i];
-		int xj = sj + d2[i];
-		if (xi < 0 || xi >= m || xj < 0 || xj >=n) continue;
-		if (a[xi][xj] != -1)
-		{
-			dis[xi][xj] = a[xi][xj];
-			heapPush(dis[xi][xj], xi, xj);
-		}
-	}
-	v[si][sj] = 1;
+the two stars are not connected (belong to different constellation.)
 
-	while (heapSize > 0)
-	{
-		Node cur = heapPop();
-		if (v[cur.i][cur.j]) continue;          // đã xử lý rồi -> bỏ qua (lazy delete)
-		if (cur.dist > dis[cur.i][cur.j]) continue; // entry cũ, đã bị update -> bỏ qua
-		v[cur.i][cur.j] = 1;
-		if (cur.i == st && cur.j == ed) return;
+How many constellations are in your sky map, and what is the number of starts in the greatest constellation?
 
-		for (int i = 0; i < 4; i++)
-		{
-			int xi = cur.i + d1[i];
-			int xj = cur.j + d2[i];
-			if (xi < 0 || xi >= m || xj < 0 || xj >=n) continue;
-			if (!v[xi][xj] && a[xi][xj] != -1 && dis[xi][xj] > dis[cur.i][cur.j] + a[xi][xj])
-			{
-				dis[xi][xj] = dis[cur.i][cur.j] + a[xi][xj];
-				heapPush(dis[xi][xj], xi, xj);
-			}
-		}
-	}
-	return;
-}
+[Input]
 
-int main()
-{
-	int t;
-	cin>>t;
-	for(int test_case = 1; test_case <= t; ++test_case)
-	{
-		st = ed = 0;
-		cin>>m>>n;
-		for (int i = 0; i < m; i++)
-		{
-			for (int j = 0; j < n; j++)
-			{
-				char c;
-				cin>>c;
-				if (c == 'Y') a[i][j] = 0;
-				else if (c == 'B') a[i][j] = 2;
-				else if (c == 'E') a[i][j] = 1;
-				else if (c == 'R' || c == 'S') a[i][j] = -1;
-				else if (c == 'T')
-				{
-					a[i][j] = 1;
-					st = i;
-					ed = j;
-				}
-				v[i][j] = 0;
-				dis[i][j] = 10000000;
-			}
-		}
+There can be more than one test case in the input.
 
-		djk(0,0);
-		if (dis[st][ed] == 10000000) cout<<"Case #"<<test_case<<endl<<"-1"<<endl;
-		else
-			cout<<"Case #"<<test_case<<endl<<dis[st][ed]<<endl;
-	}
-	return 0;
-}
+The first line has T, the number of test cases.
+
+Then the totally T test cases are provided in the following lines (T<=10)
+
+In each test case, the first line has an integer N(5 ≤ N ≤ 25), the size of map.
+
+The map is a square, and is represented as N x N matrix.
+
+For next N lines, each contains each raw of the matrix
+
+[Output]
+
+For each test case, you should print the number of constellation and the number of starts in the greatest constellation separated by blank.
