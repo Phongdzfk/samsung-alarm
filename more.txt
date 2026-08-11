@@ -7,8 +7,46 @@ int dis[305][305] = {};
 int v[305][305] = {};
 int d1[4] = {0,0,1,-1};
 int d2[4] = {1,-1,0,0};
+
+// ---- min-heap thủ công (lazy deletion) ----
+struct Node { int dist, i, j; };
+Node heap[400005];
+int heapSize = 0;
+
+void heapPush(int dist, int i, int j)
+{
+	heap[++heapSize] = {dist, i, j};
+	int c = heapSize;
+	while (c > 1)
+	{
+		int p = c / 2;
+		if (heap[p].dist <= heap[c].dist) break;
+		Node tmp = heap[p]; heap[p] = heap[c]; heap[c] = tmp;
+		c = p;
+	}
+}
+
+Node heapPop()
+{
+	Node top = heap[1];
+	heap[1] = heap[heapSize--];
+	int p = 1;
+	while (true)
+	{
+		int l = p*2, r = p*2+1, small = p;
+		if (l <= heapSize && heap[l].dist < heap[small].dist) small = l;
+		if (r <= heapSize && heap[r].dist < heap[small].dist) small = r;
+		if (small == p) break;
+		Node tmp = heap[p]; heap[p] = heap[small]; heap[small] = tmp;
+		p = small;
+	}
+	return top;
+}
+// --------------------------------------------
+
 void djk(int si,int sj)
 {
+	heapSize = 0;
 	for (int i = 0; i < 4; i++)
 	{
 		int xi = si + d1[i];
@@ -16,47 +54,35 @@ void djk(int si,int sj)
 		if (xi < 0 || xi >= m || xj < 0 || xj >=n) continue;
 		if (a[xi][xj] != -1)
 		{
-			 dis[xi][xj] = a[xi][xj];
-			 //cout<<"ini "<<xi<<" "<<xj<<" "<<dis[xi][xj]<<endl;
+			dis[xi][xj] = a[xi][xj];
+			heapPush(dis[xi][xj], xi, xj);
 		}
 	}
 	v[si][sj] = 1;
-	int cnt = 1;
-	while (cnt < n * m)
+
+	while (heapSize > 0)
 	{
-		int minn = 1000000;
-		int idx1,idx2 = -1;
-		for (int z1 = 0; z1 < m; z1++)
-		{
-			for (int z2 = 0; z2 < n; z2++)
-			{
-				if (!v[z1][z2] && dis[z1][z2] < minn)
-				{
-					minn = dis[z1][z2];
-					idx1 = z1;
-					idx2 = z2;
-				}
-			}
-		}
-		//cout<<"find "<<minn<<" "<<idx1<<" "<<idx2<<endl;
-		if (idx1 == -1) return;
-		v[idx1][idx2] = 1;
-		if (idx1 == st && idx2 == ed) return;
+		Node cur = heapPop();
+		if (v[cur.i][cur.j]) continue;          // đã xử lý rồi -> bỏ qua (lazy delete)
+		if (cur.dist > dis[cur.i][cur.j]) continue; // entry cũ, đã bị update -> bỏ qua
+		v[cur.i][cur.j] = 1;
+		if (cur.i == st && cur.j == ed) return;
+
 		for (int i = 0; i < 4; i++)
 		{
-			int xi = idx1 + d1[i];
-			int xj = idx2 + d2[i];
+			int xi = cur.i + d1[i];
+			int xj = cur.j + d2[i];
 			if (xi < 0 || xi >= m || xj < 0 || xj >=n) continue;
-			if (!v[xi][xj] && a[xi][xj] != -1 && dis[xi][xj] > dis[idx1][idx2] + a[xi][xj])
+			if (!v[xi][xj] && a[xi][xj] != -1 && dis[xi][xj] > dis[cur.i][cur.j] + a[xi][xj])
 			{
-				dis[xi][xj] = dis[idx1][idx2] + a[xi][xj];
-				//cout<<"upd "<<xi<<" "<<xj<<" "<<dis[xi][xj]<<endl;
+				dis[xi][xj] = dis[cur.i][cur.j] + a[xi][xj];
+				heapPush(dis[xi][xj], xi, xj);
 			}
 		}
-		cnt++;
 	}
 	return;
 }
+
 int main()
 {
 	int t;
@@ -89,9 +115,7 @@ int main()
 		djk(0,0);
 		if (dis[st][ed] == 10000000) cout<<"Case #"<<test_case<<endl<<"-1"<<endl;
 		else
-		{
 			cout<<"Case #"<<test_case<<endl<<dis[st][ed]<<endl;
-		}
 	}
 	return 0;
 }
