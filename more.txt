@@ -1,29 +1,77 @@
-﻿You are making “sky map” to represent constellation (group of starts) in the sky.
+#include <iostream>
 
-In each element, 1 means star, 0 means empty.
+using namespace std;
 
-And in a constellation, each start should have at least one connection with others via left/right/up/bottom. 
+int N;
+int grid[30][30];
 
-If two starts are located via diagonal, then
+// Các hướng di chuyển: Lên, Xuống, Trái, Phải
+int dr[] = {-1, 1, 0, 0};
+int dc[] = {0, 0, -1, 1};
 
-the two stars are not connected (belong to different constellation.)
+// Hàm DFS để đếm số lượng ngôi sao trong một chòm sao
+int dfs(int r, int c) {
+    grid[r][c] = 0; // Đánh dấu là đã duyệt bằng cách xóa ngôi sao (đổi thành 0)
+    int stars_count = 1; // Tính cả ngôi sao hiện tại
+    
+    // Kiểm tra 4 hướng xung quanh
+    for (int i = 0; i < 4; ++i) {
+        int nr = r + dr[i];
+        int nc = c + dc[i];
+        
+        // Nếu tọa độ hợp lệ và có ngôi sao (1)
+        if (nr >= 0 && nr < N && nc >= 0 && nc < N && grid[nr][nc] == 1) {
+            stars_count += dfs(nr, nc);
+        }
+    }
+    
+    return stars_count;
+}
 
-How many constellations are in your sky map, and what is the number of starts in the greatest constellation?
+void solve() {
+    cin >> N;
+    
+    // Đọc ma trận đầu vào
+    for (int i = 0; i < N; ++i) {
+        for (int j = 0; j < N; ++j) {
+            cin >> grid[i][j];
+        }
+    }
+    
+    int num_constellations = 0;
+    int max_stars = 0;
+    
+    // Duyệt qua từng ô trong ma trận
+    for (int i = 0; i < N; ++i) {
+        for (int j = 0; j < N; ++j) {
+            // Nếu phát hiện một ngôi sao chưa được duyệt (1)
+            if (grid[i][j] == 1) {
+                num_constellations++; // Tăng số lượng chòm sao
+                int current_stars = dfs(i, j); // Đếm số ngôi sao trong chòm sao này
+                
+                // Cập nhật chòm sao lớn nhất
+                if (current_stars > max_stars) {
+                    max_stars = current_stars;
+                }
+            }
+        }
+    }
+    
+    // In ra kết quả theo yêu cầu
+    cout << num_constellations << " " << max_stars << "\n";
+}
 
-[Input]
-
-There can be more than one test case in the input.
-
-The first line has T, the number of test cases.
-
-Then the totally T test cases are provided in the following lines (T<=10)
-
-In each test case, the first line has an integer N(5 ≤ N ≤ 25), the size of map.
-
-The map is a square, and is represented as N x N matrix.
-
-For next N lines, each contains each raw of the matrix
-
-[Output]
-
-For each test case, you should print the number of constellation and the number of starts in the greatest constellation separated by blank.
+int main() {
+    // Tối ưu hóa I/O trong C++
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+    
+    int T;
+    if (cin >> T) {
+        while (T--) {
+            solve();
+        }
+    }
+    
+    return 0;
+}
