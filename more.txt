@@ -1,49 +1,59 @@
 #include<iostream>
 using namespace std;
-int m;
-int a[105][105] = {};
-int d[105] = {};
-int parent[105] = {};
-int v[105] = {};
-int cnt,ans;
-int check = 0;
-void dfs(int z)
+int n,m;
+int st,ed;
+int a[305][305] = {};
+int dis[305][305] = {};
+int v[305][305] = {};
+int d1[4] = {0,0,1,-1};
+int d2[4] = {1,-1,0,0};
+void djk(int si,int sj)
 {
-	v[z] = 1;
-	for (int i = 0; i < m; i++)
+	for (int i = 0; i < 4; i++)
 	{
-		if (v[i] && parent[z] != i && z != i && a[z][i] == 1)
+		int xi = si + d1[i];
+		int xj = sj + d2[i];
+		if (xi < 0 || xi >= m || xj < 0 || xj >=n) continue;
+		if (a[xi][xj] != -1)
 		{
-			parent[i] = z;
-			//cout<<z<<" "<<i<<endl;
-			int tmp = z;
-			cnt = d[i] + d[z];
-			//int idx1 = i;
-			//int idx2 = z;
-			a[i][z] = 0;
-			a[z][i] = 0;
-			while (tmp != i)
+			 dis[xi][xj] = a[xi][xj];
+			 //cout<<"ini "<<xi<<" "<<xj<<" "<<dis[xi][xj]<<endl;
+		}
+	}
+	v[si][sj] = 1;
+	int cnt = 1;
+	while (cnt < n * m)
+	{
+		int minn = 1000000;
+		int idx1,idx2 = -1;
+		for (int z1 = 0; z1 < m; z1++)
+		{
+			for (int z2 = 0; z2 < n; z2++)
 			{
-				if (d[tmp] + d[parent[tmp]] < cnt)
+				if (!v[z1][z2] && dis[z1][z2] < minn)
 				{
-					cnt = d[tmp] + d[parent[tmp]];
-					//idx1 = tmp;
-					//idx2 = parent[tmp];
+					minn = dis[z1][z2];
+					idx1 = z1;
+					idx2 = z2;
 				}
-				a[tmp][parent[tmp]] = 0;
-				a[parent[tmp]][tmp] = 0;
-				tmp = parent[tmp];
 			}
-			//a[idx1][idx2] = 0;
-			//a[idx2][idx1] = 0;
-			ans+=cnt;
 		}
-		else if (!v[i] && a[z][i] == 1)
+		//cout<<"find "<<minn<<" "<<idx1<<" "<<idx2<<endl;
+		if (idx1 == -1) return;
+		v[idx1][idx2] = 1;
+		if (idx1 == st && idx2 == ed) return;
+		for (int i = 0; i < 4; i++)
 		{
-			//cout<<z<<" noi "<<i<<endl;
-			parent[i] = z;
-			dfs(i);
+			int xi = idx1 + d1[i];
+			int xj = idx2 + d2[i];
+			if (xi < 0 || xi >= m || xj < 0 || xj >=n) continue;
+			if (!v[xi][xj] && a[xi][xj] != -1 && dis[xi][xj] > dis[idx1][idx2] + a[xi][xj])
+			{
+				dis[xi][xj] = dis[idx1][idx2] + a[xi][xj];
+				//cout<<"upd "<<xi<<" "<<xj<<" "<<dis[xi][xj]<<endl;
+			}
 		}
+		cnt++;
 	}
 	return;
 }
@@ -53,38 +63,35 @@ int main()
 	cin>>t;
 	for(int test_case = 1; test_case <= t; ++test_case)
 	{
-		cnt = 0;
-		ans = 0;
-		cin>>m;
+		st = ed = 0;
+		cin>>m>>n;
 		for (int i = 0; i < m; i++)
 		{
-			for (int j = 0; j < m; j++)
-			{
-				a[i][j] = 0;
-			}
-			v[i] = 0;
-			parent[i] = 10000;
-		}
-		for (int i = 0; i < m; i++)
-		{
-			int i1,n;
-			cin>>i1>>d[i]>>n;
 			for (int j = 0; j < n; j++)
 			{
-				int tmp;
-				cin>>tmp;
-				a[i][tmp] = 1;
+				char c;
+				cin>>c;
+				if (c == 'Y') a[i][j] = 0;
+				else if (c == 'B') a[i][j] = 2;
+				else if (c == 'E') a[i][j] = 1;
+				else if (c == 'R' || c == 'S') a[i][j] = -1;
+				else if (c == 'T')
+				{
+					a[i][j] = 1;
+					st = i;
+					ed = j;
+				}
+				v[i][j] = 0;
+				dis[i][j] = 10000000;
 			}
 		}
-		for (int i = 0; i < m; i++)
+
+		djk(0,0);
+		if (dis[st][ed] == 10000000) cout<<"Case #"<<test_case<<endl<<"-1"<<endl;
+		else
 		{
-			if (!v[i])
-			{
-				check = 1;
-				dfs(i);
-			}
+			cout<<"Case #"<<test_case<<endl<<dis[st][ed]<<endl;
 		}
-		cout<<"Case #"<<test_case<<endl<<ans<<endl;
 	}
 	return 0;
 }
