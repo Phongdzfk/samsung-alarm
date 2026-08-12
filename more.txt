@@ -1,77 +1,77 @@
-#include <iostream>
+This time, Samsung Electronics, in a new building was built on the Umyeon Dong.
 
-using namespace std;
+Wireless division also was assigned to the spacious.
 
-int N;
-int grid[30][30];
+The total space for Wireless division is fixed and the space for each group is fixed.
 
-// Các hướng di chuyển: Lên, Xuống, Trái, Phải
-int dr[] = {-1, 1, 0, 0};
-int dc[] = {0, 0, -1, 1};
+Now we should assign partitions for each group.
 
-// Hàm DFS để đếm số lượng ngôi sao trong một chòm sao
-int dfs(int r, int c) {
-    grid[r][c] = 0; // Đánh dấu là đã duyệt bằng cách xóa ngôi sao (đổi thành 0)
-    int stars_count = 1; // Tính cả ngôi sao hiện tại
-    
-    // Kiểm tra 4 hướng xung quanh
-    for (int i = 0; i < 4; ++i) {
-        int nr = r + dr[i];
-        int nc = c + dc[i];
-        
-        // Nếu tọa độ hợp lệ và có ngôi sao (1)
-        if (nr >= 0 && nr < N && nc >= 0 && nc < N && grid[nr][nc] == 1) {
-            stars_count += dfs(nr, nc);
-        }
-    }
-    
-    return stars_count;
-}
+ 
 
-void solve() {
-    cin >> N;
-    
-    // Đọc ma trận đầu vào
-    for (int i = 0; i < N; ++i) {
-        for (int j = 0; j < N; ++j) {
-            cin >> grid[i][j];
-        }
-    }
-    
-    int num_constellations = 0;
-    int max_stars = 0;
-    
-    // Duyệt qua từng ô trong ma trận
-    for (int i = 0; i < N; ++i) {
-        for (int j = 0; j < N; ++j) {
-            // Nếu phát hiện một ngôi sao chưa được duyệt (1)
-            if (grid[i][j] == 1) {
-                num_constellations++; // Tăng số lượng chòm sao
-                int current_stars = dfs(i, j); // Đếm số ngôi sao trong chòm sao này
-                
-                // Cập nhật chòm sao lớn nhất
-                if (current_stars > max_stars) {
-                    max_stars = current_stars;
-                }
-            }
-        }
-    }
-    
-    // In ra kết quả theo yêu cầu
-    cout << num_constellations << " " << max_stars << "\n";
-}
+The time for assigning partition is proportional to size of space.
 
-int main() {
-    // Tối ưu hóa I/O trong C++
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    
-    int T;
-    if (cin >> T) {
-        while (T--) {
-            solve();
-        }
-    }
-    
-    return 0;
-}
+For example, if the size of space is 1000, it spends time of 1000 to partition it
+
+(It spends same time if we partition it as 300+700 or 500+500.)
+
+ 
+
+The total time depends on the order of partitioning.
+
+For example, in case the size of total space is 800, and each size for groups is 100, 200, and 500.
+
+If partitioning 100+700 first, partitioning 200+500 later, then the total time is 800+700=1500
+
+But, if partitioning 500+300 first, partitioning 100+200 later, then the total time is 800+300=1100
+
+ 
+
+Write program to print the minimum time to partition for all groups.
+
+ 
+
+[Input]
+
+There can be more than one test case in the input.
+
+The first line has T, the number of test cases.
+
+Then the totally T test cases are provided in the following lines.
+
+In each test case, the first line has an integer N(1 ≤ N ≤ 1000); the number of group.
+
+The next line enumerates N integers each separated by a blank; each integer means the size of space(S) for each group. (10≤S≤5000)
+
+ 
+
+[Output]
+
+For each test case, you should print your answer in two line.
+
+ 
+
+[Sample]
+
+Input
+
+2
+
+3
+
+500 100 200
+
+4
+
+30 40 10 20
+
+ 
+
+Output
+
+Case #1
+
+1100
+
+Case #2
+
+190
