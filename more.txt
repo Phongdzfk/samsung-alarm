@@ -1,77 +1,69 @@
-This time, Samsung Electronics, in a new building was built on the Umyeon Dong.
+#include<iostream>
+using namespace std;
 
-Wireless division also was assigned to the spacious.
+int heap[1005];
+int heapSize;
 
-The total space for Wireless division is fixed and the space for each group is fixed.
+void heapPush(int x)
+{
+	heap[++heapSize] = x;
+	int c = heapSize;
+	while (c > 1)
+	{
+		int p = c / 2;
+		if (heap[p] <= heap[c]) break;
+		int tmp = heap[p]; heap[p] = heap[c]; heap[c] = tmp;
+		c = p;
+	}
+}
 
-Now we should assign partitions for each group.
+int heapPop()
+{
+	int top = heap[1];
+	heap[1] = heap[heapSize--];
+	int p = 1;
+	while (true)
+	{
+		int l = p*2, r = p*2+1, small = p;
+		if (l <= heapSize && heap[l] < heap[small]) small = l;
+		if (r <= heapSize && heap[r] < heap[small]) small = r;
+		if (small == p) break;
+		int tmp = heap[p]; heap[p] = heap[small]; heap[small] = tmp;
+		p = small;
+	}
+	return top;
+}
 
- 
+int main()
+{
+	ios_base::sync_with_stdio(false);
+	cin.tie(NULL);
 
-The time for assigning partition is proportional to size of space.
+	int t;
+	cin>>t;
+	for (int test_case = 1; test_case <= t; ++test_case)
+	{
+		int n;
+		cin>>n;
+		heapSize = 0;
+		for (int i = 0; i < n; i++)
+		{
+			int s;
+			cin>>s;
+			heapPush(s);
+		}
 
-For example, if the size of space is 1000, it spends time of 1000 to partition it
+		long long ans = 0;
+		while (heapSize > 1)
+		{
+			int a = heapPop();
+			int b = heapPop();
+			int merged = a + b;
+			ans += merged;
+			heapPush(merged);
+		}
 
-(It spends same time if we partition it as 300+700 or 500+500.)
-
- 
-
-The total time depends on the order of partitioning.
-
-For example, in case the size of total space is 800, and each size for groups is 100, 200, and 500.
-
-If partitioning 100+700 first, partitioning 200+500 later, then the total time is 800+700=1500
-
-But, if partitioning 500+300 first, partitioning 100+200 later, then the total time is 800+300=1100
-
- 
-
-Write program to print the minimum time to partition for all groups.
-
- 
-
-[Input]
-
-There can be more than one test case in the input.
-
-The first line has T, the number of test cases.
-
-Then the totally T test cases are provided in the following lines.
-
-In each test case, the first line has an integer N(1 ≤ N ≤ 1000); the number of group.
-
-The next line enumerates N integers each separated by a blank; each integer means the size of space(S) for each group. (10≤S≤5000)
-
- 
-
-[Output]
-
-For each test case, you should print your answer in two line.
-
- 
-
-[Sample]
-
-Input
-
-2
-
-3
-
-500 100 200
-
-4
-
-30 40 10 20
-
- 
-
-Output
-
-Case #1
-
-1100
-
-Case #2
-
-190
+		cout<<"Case #"<<test_case<<endl<<ans<<endl;
+	}
+	return 0;
+}
