@@ -1,26 +1,25 @@
 #include <iostream>
-
 using namespace std;
 char a[205][205];
-int visited[205][205];
-int direction[205][205];
+int visited[205][205][2];   // [i][j][0]=dọc, [i][j][1]=ngang
 int d1[4] = {0,0,-1,1};
 int d2[4] = {1,-1,0,0};
 int n,m;
-int ans = 0;
 struct point
 {
 	int a;
 	int b;
+	int dir;
 };
 point q[10000005];
 int front = 0;
 int rear = -1;
-void push(int i,int j)
+void push(int i,int j,int dir)
 {
 	rear++;
 	q[rear].a = i;
 	q[rear].b = j;
+	q[rear].dir = dir;
 }
 point pop()
 {
@@ -32,8 +31,10 @@ bool empty()
 }
 void bfs(int i1, int j1, int i2, int j2)
 {
-	push(i1,j1);
-	visited[i1][j1] = 0;
+	visited[i1][j1][0] = 0;
+	visited[i1][j1][1] = 0;
+	push(i1,j1,0);
+	push(i1,j1,1);   // ô xuất phát: chưa có hướng, coi cả 2 trạng thái đều = 0
 	while (!empty())
 	{
 		point z = pop();
@@ -44,35 +45,14 @@ void bfs(int i1, int j1, int i2, int j2)
 			if (x1 < 0 || x1 >= m || x2 < 0|| x2 >= n) continue;
 			if (a[x1][x2] == '0')
 			{
-				int tmp = 0;
-				if (direction[z.a][z.b] == 0)
+				int newDir = (d1[i] != 0) ? 0 : 1;
+				int cost = (newDir == z.dir) ? 0 : 1;
+				int tmp = visited[z.a][z.b][z.dir] + cost;
+
+				if (tmp < visited[x1][x2][newDir])
 				{
-					if (d1[i] != 0) direction[x1][x2] = 1;
-					else direction[x1][x2] = 2;
-					tmp = visited[z.a][z.b];
-				}
-				else if (direction[z.a][z.b] != 0)
-				{
-					if (direction[z.a][z.b] == 1 && d1[i] == 0)
-					{
-						direction[x1][x2] = 2;
-						tmp = visited[z.a][z.b] + 1;
-					}
-					else if (direction[z.a][z.b] == 2 && d2[i] == 0)
-					{
-						direction[x1][x2] = 1;
-						tmp = visited[z.a][z.b] + 1;
-					}
-					else
-					{
-						tmp = visited[z.a][z.b];
-						direction[x1][x2] = direction[z.a][z.b];
-					}
-				}
-				if (tmp < visited[x1][x2])
-				{
-					visited[x1][x2] = tmp;
-					push(x1,x2);
+					visited[x1][x2][newDir] = tmp;
+					push(x1,x2,newDir);
 				}
 			}
 		}
@@ -81,7 +61,6 @@ void bfs(int i1, int j1, int i2, int j2)
 }
 int main()
 {
-	//freopen("Text.txt", "r", stdin);
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
     int t;
@@ -102,23 +81,14 @@ int main()
 			for (int j = 0; j < n; j++)
 			{
 				cin>>a[i][j];
-				visited[i][j] = 10000000;
-				direction[i][j] = 0;
+				visited[i][j][0] = 10000000;
+				visited[i][j][1] = 10000000;
 			}
 		}
 		bfs(st1,st2,ed1,ed2);
-		for (int i = 0; i < m; i++)
-		{
-			for (int j = 0; j < n; j++)
-			{
-				if (visited[i][j] == 10000000) cout <<"."<<" ";
-				else cout<<visited[i][j]<<" ";
-			}
-			cout<<endl;
-		}
-		if (visited[ed1][ed2] == 10000000) cout<<-1<<endl;
-		else cout<<visited[ed1][ed2]<<endl;
+		int ans = min(visited[ed1][ed2][0], visited[ed1][ed2][1]);
+		if (ans == 10000000) cout<<-1<<endl;
+		else cout<<ans<<endl;
 	}
     return 0;
 }
-   
