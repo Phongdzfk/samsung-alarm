@@ -1,127 +1,113 @@
 #include <iostream>
 using namespace std;
+
 int a[105][105];
-int n,m;
-int visitedr[105][105] = {};
-int disr[105][105] = {};
-int selected[105][105] = {};
+int n, m;
 int dx[] = {0, 0, -1, 1};
 int dy[] = {-1, 1, 0, 0};
-int ans;
-struct point{
-	int a;
-	int b;
-};
-point q[1000005] = {};
-point qq[1000005] = {};
-int front = 0;
-int rear = -1;
-int soban1 = 0;
-int soban2 = -1;
-void push(int x, int y)
-{
-	rear++;
-	q[rear].a = x;
-	q[rear].b = y;
+
+struct point { int a, b; };
+point q[1000005];
+int front_, rear_;
+
+void push(int x, int y) { rear_++; q[rear_].a = x; q[rear_].b = y; }
+point pop() { return q[front_++]; }
+bool empty_() { return front_ > rear_; }
+
+int visited[105][105];
+int dis[105][105];
+
+void bfs(int sx, int sy) {
+    front_ = 0; rear_ = -1;
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++) {
+            visited[i][j] = 0;
+            dis[i][j] = -1;
+        }
+    visited[sx][sy] = 1;
+    dis[sx][sy] = 0;
+    push(sx, sy);
+    while (!empty_()) {
+        point z = pop();
+        for (int i = 0; i < 4; i++) {
+            int x = z.a + dx[i];
+            int y = z.b + dy[i];
+            if (x < 0 || y < 0 || x >= n || y >= m) continue;
+            if (a[x][y] == 2) continue;
+            if (visited[x][y]) continue;
+            visited[x][y] = 1;
+            dis[x][y] = dis[z.a][z.b] + 1;
+            push(x, y);
+        }
+    }
 }
-point pop()
-{
-	return q[front++];
-}
-bool empty()
-{
-	return front > rear;
-}
-int bfs(int visited[105][105], int dis[105][105],int check)
-{
-	while(!empty())
-	{
-		point z = pop();
-		if (check == 0 && a[z.a][z.b] == 1)
-		{
-			soban2++;
-			qq[soban2].a = z.a;
-			qq[soban2].b = z.b;
-		}
-		if (check != 0 && a[z.a][z.b] == 1 && dis[z.a][z.b] != 0)
-		{
-			if (!selected[z.a][z.b] && dis[z.a][z.b] + check <= disr[z.a][z.b])
-			{
-				selected[z.a][z.b] = 1;
-				return 1;
-			}
-			else if (selected[z.a][z.b] && dis[z.a][z.b] <= check)
-			{
-				return 1;
-			}
-		}
-		for (int i = 0; i < 4; i++)
-		{
-			int x = z.a+dx[i];
-			int y = z.b+dy[i];
-			if (x < 0 || y < 0 || x >=n || y >=m) continue;
-			if (a[x][y] == 2) continue;
-			if (visited[x][y]) continue;
-			visited[x][y] = 1;
-			dis[x][y] = dis[z.a][z.b]+1;
-			push(x,y);
-		}
-	}
-	return 0;
+
+const int INF = 1e9;
+int dist_[11][11];
+int used[10];
+int k;
+int best;
+void solve(int pos, int visitedCount, int sum) {
+    if (sum >= best) return; // cắt nhánh: đã tệ hơn best rồi thì bỏ
+    if (visitedCount == k) {
+        best = sum;
+        return;
+    }
+    for (int j = 0; j < k; j++) {
+        if (used[j]) continue;
+        if (dist_[pos][j + 1] == -1) continue; // không tới được
+        used[j] = 1;
+        solve(j + 1, visitedCount + 1, sum + dist_[pos][j + 1]);
+        used[j] = 0;
+    }
 }
 
 int main() {
-	int t;
-	cin>>t;
-	for (int test = 1; test <= t; test++)
-	{
-		front = 0;
-		int cnt = 0;
-		ans = 0;
-		soban1 = 0;
-		soban2 = -1;
-		rear = -1;
-		cin>>n>>m;
-		int st1;
-		int st2;
-		for (int i = 0; i < n; i++)
-		{
-			for (int j = 0; j < m; j++)
-			{
-				cin>>a[i][j];
-				visitedr[i][j] = 0;
-				selected[i][j] = 0;
-				disr[i][j] = 0;
-				if (a[i][j] == 3)
-				{
-					st1 = i;
-					st2 = j;
-				}
-				if (a[i][j] == 1) cnt++;
-			}
-		}
-		push(st1,st2);
-		visitedr[st1][st2] = 1;
-		bfs(visitedr,disr,0);
-		point x = qq[soban1];
-		ans = disr[x.a][x.b];
-		while(soban1 <= soban2)
-		{
-			int tempv[105][105] = {};
-			int tempd[105][105] = {};
-			front = 0;
-			rear = -1;
-			point z = qq[soban1++];
-			push(z.a,z.b);
-			tempv[z.a][z.b] = 1;
-			if (!bfs(tempv,tempd,disr[z.a][z.b]))
-			{
-				if (soban1 < soban2) ans = ans +(tempd[z.a][z.b] * 2);
-				else if (soban1 == soban2) ans = ans + tempd[z.a][z.b];
-			}
-		}
-		if (soban2 + 1 < cnt) cout<<"Case #"<<test<<endl<<-1<<endl;
-		cout<<"Case #"<<test<<endl<<ans<<endl;
-	}
+    int t;
+    cin >> t;
+    for (int test = 1; test <= t; test++) {
+        cin >> n >> m;
+        int st1 = -1, st2 = -1;
+        int dirtyR[15], dirtyC[15];
+        k = 0;
+
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < m; j++) {
+                cin >> a[i][j];
+                if (a[i][j] == 3) { st1 = i; st2 = j; }
+                if (a[i][j] == 1) { dirtyR[k] = i; dirtyC[k] = j; k++; }
+            }
+
+        if (k == 0) {
+            cout << "Case #" << test << "\n" << 0 << "\n";
+            continue;
+        }
+
+        bfs(st1, st2);
+        for (int i = 0; i < k; i++) dist_[0][i + 1] = dis[dirtyR[i]][dirtyC[i]];
+
+        for (int i = 0; i < k; i++) {
+            bfs(dirtyR[i], dirtyC[i]);
+            dist_[i + 1][0] = dis[st1][st2];
+            for (int j = 0; j < k; j++)
+                dist_[i + 1][j + 1] = dis[dirtyR[j]][dirtyC[j]];
+        }
+
+        bool impossible = false;
+        for (int i = 0; i < k; i++)
+            if (dist_[0][i + 1] == -1) impossible = true;
+
+        cout << "Case #" << test << "\n";
+        if (impossible) {
+            cout << -1 << "\n";
+            continue;
+        }
+
+        for (int i = 0; i < k; i++) used[i] = 0;
+        best = INF;
+        solve(0, 0, 0);
+
+        cout << (best >= INF ? -1 : best) << "\n";
+    }
     return 0;
 }
