@@ -1,69 +1,37 @@
-#include <iostream>
-using namespace std;
+int best = 1e9;
+int board[4][4]; // trạng thái gốc
 
-// Hoán đổi giá trị 2 biến int
-void swapVal(int &a, int &b) {
-    int t = a;
-    a = b;
-    b = t;
-}
+int dx[] = {0, 0, 0, -1, 1};
+int dy[] = {0, -1, 1, 0, 0};
 
-// Partition cho quicksort, sắp xếp theo mảng end tăng dần
-// (mảng start được hoán đổi song song để giữ đúng cặp start-end)
-int partition(int start[], int end[], int low, int high) {
-    int pivot = end[high];
-    int i = low - 1;
-
-    for (int j = low; j < high; j++) {
-        if (end[j] < pivot) {
-            i++;
-            swapVal(start[i], start[j]);
-            swapVal(end[i], end[j]);
-        }
-    }
-    swapVal(start[i + 1], start[high]);
-    swapVal(end[i + 1], end[high]);
-
-    return i + 1;
-}
-
-void quickSort(int start[], int end[], int low, int high) {
-    if (low < high) {
-        int pi = partition(start, end, low, high);
-        quickSort(start, end, low, pi - 1);
-        quickSort(start, end, pi + 1, high);
+void press(int r, int c) {
+    for (int k = 0; k < 5; k++) {
+        int nr = r + dx[k], nc = c + dy[k];
+        if (nr >= 0 && nr < 4 && nc >= 0 && nc < 4)
+            board[nr][nc] ^= 1;
     }
 }
 
-int main() {
-    int n;
-    cin >> n; // Số lượng cuộc họp
+bool isSameColor() {
+    for (int i = 0; i < 4; i++)
+        for (int j = 0; j < 4; j++)
+            if (board[i][j] != board[0][0]) return false;
+    return true;
+}
 
-    int *start = new int[n];
-    int *end = new int[n];
-
-    for (int i = 0; i < n; i++) {
-        cin >> start[i] >> end[i];
+void backtrack(int idx, int count) {
+    if (count >= best) return; // prune nhẹ nếu đã tệ hơn best
+    if (idx == 16) {
+        if (isSameColor()) best = min(best, count);
+        return;
     }
+    int r = idx / 4, c = idx % 4;
 
-    // Bước 1: Sắp xếp theo end_time (thay cho sort() + struct)
-    quickSort(start, end, 0, n - 1);
+    // Không bấm ô này
+    backtrack(idx + 1, count);
 
-    int count = 0;
-    int last_end_time = -1;
-
-    // Bước 2 & 3: Lựa chọn tham lam
-    for (int i = 0; i < n; i++) {
-        if (start[i] >= last_end_time) {
-            count++;
-            last_end_time = end[i];
-        }
-    }
-
-    cout << count << "\n";
-
-    delete[] start;
-    delete[] end;
-
-    return 0;
+    // Bấm ô này
+    press(r, c);
+    backtrack(idx + 1, count + 1);
+    press(r, c); // undo (bấm lại lần nữa = trả về trạng thái cũ)
 }
