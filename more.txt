@@ -1,37 +1,127 @@
-int best = 1e9;
-int board[4][4]; // trạng thái gốc
-
-int dx[] = {0, 0, 0, -1, 1};
-int dy[] = {0, -1, 1, 0, 0};
-
-void press(int r, int c) {
-    for (int k = 0; k < 5; k++) {
-        int nr = r + dx[k], nc = c + dy[k];
-        if (nr >= 0 && nr < 4 && nc >= 0 && nc < 4)
-            board[nr][nc] ^= 1;
-    }
+#include <iostream>
+using namespace std;
+int a[105][105];
+int n,m;
+int visitedr[105][105] = {};
+int disr[105][105] = {};
+int selected[105][105] = {};
+int dx[] = {0, 0, -1, 1};
+int dy[] = {-1, 1, 0, 0};
+int ans;
+struct point{
+	int a;
+	int b;
+};
+point q[1000005] = {};
+point qq[1000005] = {};
+int front = 0;
+int rear = -1;
+int soban1 = 0;
+int soban2 = -1;
+void push(int x, int y)
+{
+	rear++;
+	q[rear].a = x;
+	q[rear].b = y;
+}
+point pop()
+{
+	return q[front++];
+}
+bool empty()
+{
+	return front > rear;
+}
+int bfs(int visited[105][105], int dis[105][105],int check)
+{
+	while(!empty())
+	{
+		point z = pop();
+		if (check == 0 && a[z.a][z.b] == 1)
+		{
+			soban2++;
+			qq[soban2].a = z.a;
+			qq[soban2].b = z.b;
+		}
+		if (check != 0 && a[z.a][z.b] == 1 && dis[z.a][z.b] != 0)
+		{
+			if (!selected[z.a][z.b] && dis[z.a][z.b] + check <= disr[z.a][z.b])
+			{
+				selected[z.a][z.b] = 1;
+				return 1;
+			}
+			else if (selected[z.a][z.b] && dis[z.a][z.b] <= check)
+			{
+				return 1;
+			}
+		}
+		for (int i = 0; i < 4; i++)
+		{
+			int x = z.a+dx[i];
+			int y = z.b+dy[i];
+			if (x < 0 || y < 0 || x >=n || y >=m) continue;
+			if (a[x][y] == 2) continue;
+			if (visited[x][y]) continue;
+			visited[x][y] = 1;
+			dis[x][y] = dis[z.a][z.b]+1;
+			push(x,y);
+		}
+	}
+	return 0;
 }
 
-bool isSameColor() {
-    for (int i = 0; i < 4; i++)
-        for (int j = 0; j < 4; j++)
-            if (board[i][j] != board[0][0]) return false;
-    return true;
-}
-
-void backtrack(int idx, int count) {
-    if (count >= best) return; // prune nhẹ nếu đã tệ hơn best
-    if (idx == 16) {
-        if (isSameColor()) best = min(best, count);
-        return;
-    }
-    int r = idx / 4, c = idx % 4;
-
-    // Không bấm ô này
-    backtrack(idx + 1, count);
-
-    // Bấm ô này
-    press(r, c);
-    backtrack(idx + 1, count + 1);
-    press(r, c); // undo (bấm lại lần nữa = trả về trạng thái cũ)
+int main() {
+	int t;
+	cin>>t;
+	for (int test = 1; test <= t; test++)
+	{
+		front = 0;
+		int cnt = 0;
+		ans = 0;
+		soban1 = 0;
+		soban2 = -1;
+		rear = -1;
+		cin>>n>>m;
+		int st1;
+		int st2;
+		for (int i = 0; i < n; i++)
+		{
+			for (int j = 0; j < m; j++)
+			{
+				cin>>a[i][j];
+				visitedr[i][j] = 0;
+				selected[i][j] = 0;
+				disr[i][j] = 0;
+				if (a[i][j] == 3)
+				{
+					st1 = i;
+					st2 = j;
+				}
+				if (a[i][j] == 1) cnt++;
+			}
+		}
+		push(st1,st2);
+		visitedr[st1][st2] = 1;
+		bfs(visitedr,disr,0);
+		point x = qq[soban1];
+		ans = disr[x.a][x.b];
+		while(soban1 <= soban2)
+		{
+			int tempv[105][105] = {};
+			int tempd[105][105] = {};
+			front = 0;
+			rear = -1;
+			point z = qq[soban1++];
+			push(z.a,z.b);
+			tempv[z.a][z.b] = 1;
+			if (!bfs(tempv,tempd,disr[z.a][z.b]))
+			{
+				if (soban1 < soban2) ans = ans +(tempd[z.a][z.b] * 2);
+				else if (soban1 == soban2) ans = ans + tempd[z.a][z.b];
+			}
+		}
+		if (soban2 + 1 < cnt) cout<<"Case #"<<test<<endl<<-1<<endl;
+		cout<<"Case #"<<test<<endl<<ans<<endl;
+	}
+    return 0;
 }
