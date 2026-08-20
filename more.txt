@@ -1,113 +1,168 @@
 #include <iostream>
 using namespace std;
-
-int a[105][105];
-int n, m;
-int dx[] = {0, 0, -1, 1};
-int dy[] = {-1, 1, 0, 0};
-
-struct point { int a, b; };
-point q[1000005];
-int front_, rear_;
-
-void push(int x, int y) { rear_++; q[rear_].a = x; q[rear_].b = y; }
-point pop() { return q[front_++]; }
-bool empty_() { return front_ > rear_; }
-
-int visited[105][105];
-int dis[105][105];
-
-void bfs(int sx, int sy) {
-    front_ = 0; rear_ = -1;
-    for (int i = 0; i < n; i++)
-        for (int j = 0; j < m; j++) {
-            visited[i][j] = 0;
-            dis[i][j] = -1;
-        }
-    visited[sx][sy] = 1;
-    dis[sx][sy] = 0;
-    push(sx, sy);
-    while (!empty_()) {
-        point z = pop();
-        for (int i = 0; i < 4; i++) {
-            int x = z.a + dx[i];
-            int y = z.b + dy[i];
-            if (x < 0 || y < 0 || x >= n || y >= m) continue;
-            if (a[x][y] == 2) continue;
-            if (visited[x][y]) continue;
-            visited[x][y] = 1;
-            dis[x][y] = dis[z.a][z.b] + 1;
-            push(x, y);
-        }
-    }
+int vang[105][105] = {};
+int a[105][105] = {};
+int thutuy[5] = {};
+int thutux[5] = {};
+int num[105][105] = {};
+int visited[105][105] = {};
+int checked[105][105] = {};
+int d1[4] = {0,0,1,-1};
+int d2[4] = {1,-1,0,0};
+int ans;
+int n,g;
+struct point
+{
+	int x;
+	int y;
+};
+point q[1000005] = {};
+int rear = -1;
+int front = 0;
+void push (int x, int y)
+{
+	rear++;
+	q[rear].x = x;
+	q[rear].y = y;
 }
-
-const int INF = 1e9;
-int dist_[11][11];
-int used[10];
-int k;
-int best;
-void solve(int pos, int visitedCount, int sum) {
-    if (sum >= best) return; // cắt nhánh: đã tệ hơn best rồi thì bỏ
-    if (visitedCount == k) {
-        best = sum;
-        return;
-    }
-    for (int j = 0; j < k; j++) {
-        if (used[j]) continue;
-        if (dist_[pos][j + 1] == -1) continue; // không tới được
-        used[j] = 1;
-        solve(j + 1, visitedCount + 1, sum + dist_[pos][j + 1]);
-        used[j] = 0;
-    }
+point pop()
+{
+	return q[front++];
 }
-
+bool empty()
+{
+	return front > rear;
+}
+void bfs()
+{
+	while(!empty())
+	{
+		point z = pop();
+		for (int i = 0; i < 4; i++)
+		{
+			int x = z.x + d1[i];
+			int y = z.y + d2[i];
+			if (x <= 0 || x > n || y <= 0 || y > n) continue;
+			if (a[x][y] == 0) continue;
+			if (checked[x][y] != -1 ) continue;
+			num[x][y]++;
+			checked[x][y] = checked[z.x][z.y] + 1;
+			push(x,y);
+		}
+	}
+	return;
+}
 int main() {
+	//freopen("Text.txt","r",stdin);
     int t;
     cin >> t;
     for (int test = 1; test <= t; test++) {
-        cin >> n >> m;
-        int st1 = -1, st2 = -1;
-        int dirtyR[15], dirtyC[15];
-        k = 0;
+		front = 0;
+		rear = -1;
+		ans = 1e9;
+		cin>>n>>g;
+		for (int i = 1; i <=n; i++)
+		{
+			for (int j = 1; j <=n; j++)
+			{
+				vang[i][j] = 0;
+			}
+		}
+		for (int i = 0; i < g; i++)
+		{
+			int x,y;
+			cin>>x>>y;
+			thutux[i+1] = x;
+			thutuy[i+1] = y;
+			vang[x][y] = 1;
+		}
+		for (int i = 1; i <=n; i++)
+		{
+			for (int j = 1; j <=n; j++)
+			{
+				cin>>a[i][j];
+				visited[i][j] = -1;
+				num[i][j] = 0;
+			}
+		}
+		for (int i = 1; i <=n; i++)
+		{
+			for (int j = 1; j <=n; j++)
+			{
+				if (vang[i][j] == 1) 
+				{
+					for (int i1 = 1; i1 <=n; i1++)
+					{
+						for (int j1 = 1; j1 <=n; j1++)
+						{
+							checked[i1][j1] = -1;
+						}
+					}
+					front = 0;
+					rear = -1;
+					push(i,j);
+					checked[i][j] = 0;
+					bfs();
+					for (int i1 = 1; i1 <=n; i1++)
+					{
+						for (int j1 = 1; j1 <=n; j1++)
+						{
+							visited[i1][j1] = max(visited[i1][j1],checked[i1][j1]);
+						}
+					}
+				}
+			}
+		}
+		int curnum = 0;
+		for (int i = 1; i <=n; i++)
+		{
+			for (int j = 1; j <=n; j++)
+			{
 
-        for (int i = 0; i < n; i++)
-            for (int j = 0; j < m; j++) {
-                cin >> a[i][j];
-                if (a[i][j] == 3) { st1 = i; st2 = j; }
-                if (a[i][j] == 1) { dirtyR[k] = i; dirtyC[k] = j; k++; }
-            }
-
-        if (k == 0) {
-            cout << "Case #" << test << "\n" << 0 << "\n";
-            continue;
-        }
-
-        bfs(st1, st2);
-        for (int i = 0; i < k; i++) dist_[0][i + 1] = dis[dirtyR[i]][dirtyC[i]];
-
-        for (int i = 0; i < k; i++) {
-            bfs(dirtyR[i], dirtyC[i]);
-            dist_[i + 1][0] = dis[st1][st2];
-            for (int j = 0; j < k; j++)
-                dist_[i + 1][j + 1] = dis[dirtyR[j]][dirtyC[j]];
-        }
-
-        bool impossible = false;
-        for (int i = 0; i < k; i++)
-            if (dist_[0][i + 1] == -1) impossible = true;
-
-        cout << "Case #" << test << "\n";
-        if (impossible) {
-            cout << -1 << "\n";
-            continue;
-        }
-
-        for (int i = 0; i < k; i++) used[i] = 0;
-        best = INF;
-        solve(0, 0, 0);
-
-        cout << (best >= INF ? -1 : best) << "\n";
+				if (num[i][j] > curnum) curnum = num[i][j];
+			}
+		}
+		int idx1 = 0;
+		int idx2 = 0;
+		for (int i = 1; i <=n; i++)
+		{
+			for (int j = 1; j <=n; j++)
+			{
+				if (num[i][j] == curnum) 
+				{
+					if (visited[i][j] < ans && visited[i][j] != 0) 
+					{
+						ans = visited[i][j];
+						idx1 = i;
+						idx2 = j;
+					}
+				}
+			}
+		}
+		if (ans == 1e9) ans = -1;
+		cout<<"Case #"<<test<<endl<<ans<<endl;
+		if (ans != -1)
+		{
+			for (int i1 = 1; i1 <=n; i1++)
+			{
+				for (int j1 = 1; j1 <=n; j1++)
+				{
+					checked[i1][j1] = -1;
+				}
+			}
+			front = 0;
+			rear = -1;
+			push(idx1,idx2);
+			checked[idx1][idx2] = 0;
+			bfs();
+			for (int i = 1; i <= g; i++)
+			{
+				if (vang[thutux[i]][thutuy[i]] == 1 && checked[thutux[i]][thutuy[i]] == -1) 
+					{
+						cout<<thutux[i]<<" "<<thutuy[i]<<endl;
+					}
+			}
+		}
     }
     return 0;
 }
