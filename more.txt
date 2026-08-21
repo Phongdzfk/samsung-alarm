@@ -1,31 +1,27 @@
 #include <iostream>
 using namespace std;
-int vang[105][105] = {};
-int a[105][105] = {};
-int thutuy[5] = {};
-int thutux[5] = {};
-int num[105][105] = {};
-int visited[105][105] = {};
-int checked[105][105] = {};
+int a[305][305] = {};
+int visited[305] = {};
+int checked[305] = {};
 int d1[4] = {0,0,1,-1};
 int d2[4] = {1,-1,0,0};
 int ans;
+int res1,res2;
 int n,g;
 struct point
 {
 	int x;
 	int y;
 };
-point q[1000005] = {};
+int q[1000005] = {};
 int rear = -1;
 int front = 0;
-void push (int x, int y)
+void push (int x)
 {
 	rear++;
-	q[rear].x = x;
-	q[rear].y = y;
+	q[rear] = x;
 }
-point pop()
+int pop()
 {
 	return q[front++];
 }
@@ -33,24 +29,24 @@ bool empty()
 {
 	return front > rear;
 }
-void bfs()
+int bfs()
 {
+	int cnt = 0;
 	while(!empty())
 	{
-		point z = pop();
-		for (int i = 0; i < 4; i++)
+		int z = pop();
+		checked[z] = 1;
+		for (int j = 0; j < n; j++)
 		{
-			int x = z.x + d1[i];
-			int y = z.y + d2[i];
-			if (x <= 0 || x > n || y <= 0 || y > n) continue;
-			if (a[x][y] == 0) continue;
-			if (checked[x][y] != -1 ) continue;
-			num[x][y]++;
-			checked[x][y] = checked[z.x][z.y] + 1;
-			push(x,y);
+			if (checked[j] == 1) continue;
+			if (a[z][j] == 0) continue;
+			visited[j]++;
+			visited[z]++;
+			cnt++;
+			push(j);
 		}
 	}
-	return;
+	return cnt;
 }
 int main() {
 	//freopen("Text.txt","r",stdin);
@@ -59,110 +55,43 @@ int main() {
     for (int test = 1; test <= t; test++) {
 		front = 0;
 		rear = -1;
-		ans = 1e9;
-		cin>>n>>g;
-		for (int i = 1; i <=n; i++)
+		ans = 0;
+		res1 = res2 = 0;
+		cin>>n;
+		for (int i = 0; i < n; i++)
 		{
-			for (int j = 1; j <=n; j++)
-			{
-				vang[i][j] = 0;
-			}
-		}
-		for (int i = 0; i < g; i++)
-		{
-			int x,y;
-			cin>>x>>y;
-			thutux[i+1] = x;
-			thutuy[i+1] = y;
-			vang[x][y] = 1;
-		}
-		for (int i = 1; i <=n; i++)
-		{
-			for (int j = 1; j <=n; j++)
+			for (int j = 0; j < n; j++)
 			{
 				cin>>a[i][j];
-				visited[i][j] = -1;
-				num[i][j] = 0;
 			}
+			checked[i] = 0;
 		}
-		for (int i = 1; i <=n; i++)
+		for (int i = 0; i < n; i++)
 		{
-			for (int j = 1; j <=n; j++)
+			if (!checked[i])
 			{
-				if (vang[i][j] == 1) 
+				front = 0;
+				rear = -1;
+				for (int j = 0; j < n; j++)
 				{
-					for (int i1 = 1; i1 <=n; i1++)
+					visited[j] = 0;
+				}
+				push(i);
+				ans++;
+				if (bfs() > 0)
+				{
+					for (int j = 0; j < n; j++)
 					{
-						for (int j1 = 1; j1 <=n; j1++)
-						{
-							checked[i1][j1] = -1;
-						}
+						if (visited[j] == 1 && j != i) res1++;
 					}
-					front = 0;
-					rear = -1;
-					push(i,j);
-					checked[i][j] = 0;
-					bfs();
-					for (int i1 = 1; i1 <=n; i1++)
-					{
-						for (int j1 = 1; j1 <=n; j1++)
-						{
-							visited[i1][j1] = max(visited[i1][j1],checked[i1][j1]);
-						}
-					}
+				}
+				else
+				{
+					res2++;
 				}
 			}
 		}
-		int curnum = 0;
-		for (int i = 1; i <=n; i++)
-		{
-			for (int j = 1; j <=n; j++)
-			{
-
-				if (num[i][j] > curnum) curnum = num[i][j];
-			}
-		}
-		int idx1 = 0;
-		int idx2 = 0;
-		for (int i = 1; i <=n; i++)
-		{
-			for (int j = 1; j <=n; j++)
-			{
-				if (num[i][j] == curnum) 
-				{
-					if (visited[i][j] < ans && visited[i][j] != 0) 
-					{
-						ans = visited[i][j];
-						idx1 = i;
-						idx2 = j;
-					}
-				}
-			}
-		}
-		if (ans == 1e9) ans = -1;
-		cout<<"Case #"<<test<<endl<<ans<<endl;
-		if (ans != -1)
-		{
-			for (int i1 = 1; i1 <=n; i1++)
-			{
-				for (int j1 = 1; j1 <=n; j1++)
-				{
-					checked[i1][j1] = -1;
-				}
-			}
-			front = 0;
-			rear = -1;
-			push(idx1,idx2);
-			checked[idx1][idx2] = 0;
-			bfs();
-			for (int i = 1; i <= g; i++)
-			{
-				if (vang[thutux[i]][thutuy[i]] == 1 && checked[thutux[i]][thutuy[i]] == -1) 
-					{
-						cout<<thutux[i]<<" "<<thutuy[i]<<endl;
-					}
-			}
-		}
+		cout<<ans<<" "<<res2<<" "<<res1<<endl;
     }
     return 0;
 }
