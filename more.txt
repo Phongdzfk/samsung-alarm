@@ -1,83 +1,90 @@
-
 #include <iostream>
 using namespace std;
-int a[305][305] = {};
-int disc[305], low[305], par[305];
-int n;
-int timer_;
-int ans, res1, res2;
-bool visitedNode[305];
-
-void dfs(int u)
+int a[3005][3005] = {};
+int n,m,p,q,s,t;
+int d1[4] = {-1,1,-1,1};
+int d2[4] = {-1,1,1,-1};
+int visited[3005][3005] = {};
+int rear = -1;
+int front = 0;
+struct point
 {
-	visitedNode[u] = true;
-	disc[u] = low[u] = ++timer_;
-	int childCount = 0;
-
-	for (int v = 0; v < n; v++)
+	int x;
+	int y;
+};
+point qu[100000005];
+void push (int x, int y)
+{
+	rear++;
+	qu[rear].x = x;
+	qu[rear].y = y;
+}
+point pop()
+{
+	return qu[front++];
+}
+bool empty()
+{
+	return front > rear;
+}
+void bfs()
+{
+	while(!empty())
 	{
-		if (a[u][v] == 0) continue;
-		if (v == par[u]) continue;   // bỏ qua cạnh vừa đi từ cha xuống (tránh coi cạnh cha-con là back-edge)
-
-		if (visitedNode[v])
+		point z = pop();
+		for (int i = 0; i < 4; i++)
 		{
-			// back-edge: cập nhật low[u]
-			if (disc[v] < low[u]) low[u] = disc[v];
-		}
-		else
-		{
-			par[v] = u;
-			childCount++;
-			dfs(v);
-			if (low[v] < low[u]) low[u] = low[v];
-
-			if (low[v] > disc[u]) res1++;   // cạnh (u,v) là bridge
+			int x1 = z.x + d1[i];
+			int x2 = z.y + d2[i];
+			while (x1 >= 1 && x1 <=n && x2 >= 1 && x2 <= n && a[x1][x2] != 1)
+			{
+				if (visited[x1][x2] == -1)
+				{
+					visited[x1][x2] = visited[z.x][z.y] + 1;
+					push(x1,x2);
+					x1 += d1[i];
+					x2 += d2[i];
+				}
+				else 
+				{
+					x1 += d1[i];
+					x2 += d2[i];
+				}
+				
+			}
 		}
 	}
+	return;
 }
 
 int main()
 {
+	freopen("Text.txt","r",stdin);
 	int t;
 	cin>>t;
 	for (int test = 1; test <= t; test++)
 	{
-		cin>>n;
-		for (int i = 0; i < n; i++)
-			for (int j = 0; j < n; j++)
-				cin>>a[i][j];
-
-		for (int i = 0; i < n; i++)
+		front = 0;
+		rear = -1;
+		cin>>n>>m>>p>>q>>s>>t;
+		for (int i = 1; i <= n; i++)
 		{
-			visitedNode[i] = false;
-			disc[i] = low[i] = 0;
-			par[i] = -1;
-		}
-		timer_ = 0;
-		ans = 0; res1 = 0; res2 = 0;
-
-		for (int i = 0; i < n; i++)
-		{
-			if (!visitedNode[i])
+			for (int j = 1; j <= n; j++)
 			{
-				ans++;
-				bool hasEdge = false;
-				for (int j = 0; j < n; j++)
-					if (a[i][j] != 0) { hasEdge = true; break; }
-
-				dfs(i);
-
-				if (!hasEdge)
-				{
-					bool isolated = true;
-					for (int j = 0; j < n; j++)
-						if (a[i][j] != 0) { isolated = false; break; }
-					if (isolated) res2++;
-				}
+				a[i][j] = 0;
+				visited[i][j] = -1;
 			}
 		}
-
-		cout<<ans<<" "<<res2<<" "<<res1<<endl;
+		for (int i = 1; i <= m; i++)
+		{
+			int x,y;
+			cin>>x>>y;
+			a[x][y] = 1;
+		}
+		push(p,q);
+		visited[p][q] = 0;
+		bfs();
+		cout<<visited[s][t]<<endl;
 	}
 	return 0;
 }
