@@ -1,59 +1,135 @@
-Cho bản đồ mạng lưới giao thông giữa các làng mạc. Một vùng được định nghĩa là một tập hợp các làng mà từ bất kỳ một làng nào trong vùng đều có thể đi đến một làng khác trong vùng.
-
-Hãy tính số vùng trong bản đồ, số làng cô lập (làng không có đường đi đến bất kỳ làng khác) và số con đường đóng vai trò là “Cầu” giữa hai vùng (nếu bỏ con đường này đi thì số lượng vùng tăng lên 1).
-
-Input
-
-Dòng đầu có một số T là số lượng test của file input. Mỗi test được bố cục như sau: dòng đầu là một số nguyên dương N (N <= 300) N là số làng, tiếp theo là một ma trân A[i, j] trong đó A[i][j] có giá trị bằng 1 là có đường đi từ làng i tới làng j và 0 nếu không có đường từ làng i tới làng j. Dữ liệu đảm bảo nếu có đường từ làng i tới làng j thì cũng sẽ có đường ngược lại.
-
-Output
-
-Với mỗi test, in ra sốvùng có trên bản đồ, số làng cô lập và số đường đóng vai trò là cầu.
-
- 
-
-Sample
-
- 
-
-Input
-
-2
-
-5
-
-0 1 0 1 0
-
-1 0 0 1 0
-
-0 0 0 0 1
-
-1 1 0 0 0
-
-0 0 1 0 0
-
-7
-
-0 0 0 1 0 0 1
-
-0 0 0 1 0 0 0
-
-0 0 0 0 1 0 0
-
-1 1 0 0 0 0 1
-
-0 0 1 0 0 0 0
-
-0 0 0 0 0 0 0
-
-1 0 0 1 0 0 0
-
- 
-
-Output
-
-2 0 1
-
-3 1 2
-
- 
+#include <iostream>
+using namespace std;
+int a[3005][3005] = {};
+int n,m,p,q,s,t;
+int d1horse[8] = {-2,-1,1,2,2,1,-1,-2};
+int d2horse[8] = {1,2,2,1,-1,-2,-2,-1};
+int d1king[8] = {0,0,1,-1,1,1,-1,-1};
+int d2king[8] = {1,-1,0,0,1,-1,-1,1};
+int visitedhorse[3005][3005] = {};
+int visitedking[3005][3005] = {};
+int rear = -1;
+int front = 0;
+int ans;
+struct point
+{
+	int x;
+	int y;
+};
+point qu[1000005];
+void push (int x, int y)
+{
+	rear++;
+	qu[rear].x = x;
+	qu[rear].y = y;
+}
+point pop()
+{
+	return qu[front++];
+}
+bool empty()
+{
+	return front > rear;
+}
+void madi()
+{
+	while(!empty())
+	{
+		point z = pop();
+		for (int i = 0; i < 8; i++)
+		{
+			int x1 = z.x + d1horse[i];
+			int x2 = z.y + d2horse[i];
+			if (x1 >= 0 && x1 <m && x2 >= 0 && x2 < n && visitedhorse[x1][x2] == -1)
+			{
+				if (x1 != s || x2 != t)
+				{
+					visitedhorse[x1][x2] = visitedhorse[z.x][z.y];
+				}
+			}
+		}
+	}
+	return;
+}
+void vuadi()
+{
+	while(!empty())
+	{
+		point z = pop();
+		if (z.x == s && z.y == t)
+		{
+			return;
+		}
+		for (int i = 0; i < 8; i++)
+		{
+			int x1 = z.x + d1king[i];
+			int x2 = z.y + d2king[i];
+			if (x1 >= 0 && x1 <m && x2 >= 0 && x2 < n && visitedking[x1][x2] == -1)
+			{
+				if (visitedhorse[x1][x2] == -1 && a[x1][x2] != 1)
+				{
+					visitedking[x1][x2] = visitedking[z.x][z.y] + 1;
+					push(x1,x2);
+				}
+			}
+		}
+	}
+	return;
+}
+int main()
+{
+	//freopen("Text.txt","r",stdin);
+	int t1;
+	cin>>t1;
+	for (int test = 1; test <= t1; test++)
+	{
+		front = 0;
+		rear = -1;
+		ans = -1;
+		cin>>m>>n;
+		for (int i = 0; i < m; i++)
+		{
+			for (int j = 0; j < n; j++)
+			{
+				visitedhorse[i][j] = -1;
+				visitedking[i][j] = -1;
+				a[i][j] = 0;
+				char c;
+				cin>>c;
+				if (c == 'Z')
+				{
+					a[i][j] = 1;
+					visitedhorse[i][j] = 0;
+					push(i,j);
+				}
+				else if (c == 'A')
+				{
+					p = i;
+					q = j;
+				}
+				else if (c == 'B')
+				{
+					s = i;
+					t = j;
+				}
+			}
+		}
+		madi();
+		front = 0;
+		rear = -1;
+		push(p,q);
+		visitedking[p][q] = 0;
+		vuadi();
+		for (int i = 0; i < m; i++)
+		{
+			for (int j = 0; j < n; j++)
+			{
+				if (visitedhorse[i][j] == -1) cout<<"."<<" ";
+				else cout<<visitedhorse[i][j]<<" ";
+			}
+			cout<<endl;
+		}
+		cout<<visitedking[s][t]<<endl;
+	}
+	return 0;
+}
