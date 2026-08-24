@@ -1,16 +1,18 @@
 #include <iostream>
 using namespace std;
 int a[3005][3005] = {};
-int n,m,p,q,s,t;
-int d1horse[8] = {-2,-1,1,2,2,1,-1,-2};
-int d2horse[8] = {1,2,2,1,-1,-2,-2,-1};
-int d1king[8] = {0,0,1,-1,1,1,-1,-1};
-int d2king[8] = {1,-1,0,0,1,-1,-1,1};
-int visitedhorse[3005][3005] = {};
-int visitedking[3005][3005] = {};
+int dis[3005][3005] = {};
+int visited[3005] = {};
+int n,p,q,s,t;
+int ny[3005] = {};
+int nx[3005] = {};
 int rear = -1;
 int front = 0;
 int ans;
+int abss(int a,int b)
+{
+	return max(a-b,b-a);
+}
 struct point
 {
 	int x;
@@ -31,105 +33,64 @@ bool empty()
 {
 	return front > rear;
 }
-void madi()
+void quaylui(int i,int total,int cnt)
 {
-	while(!empty())
+	if (cnt == n)
 	{
-		point z = pop();
-		for (int i = 0; i < 8; i++)
-		{
-			int x1 = z.x + d1horse[i];
-			int x2 = z.y + d2horse[i];
-			if (x1 >= 0 && x1 <m && x2 >= 0 && x2 < n && visitedhorse[x1][x2] == -1)
-			{
-				if (x1 != s || x2 != t)
-				{
-					visitedhorse[x1][x2] = visitedhorse[z.x][z.y];
-				}
-			}
-		}
+		if (dis[i][n+1] + total < ans) ans = dis[i][n+1] + total;
+		return;
 	}
-	return;
-}
-void vuadi()
-{
-	while(!empty())
+	if (total > ans) return;
+	for (int j = 1; j <= n; j++)
 	{
-		point z = pop();
-		if (z.x == s && z.y == t)
+		if (visited[j] == 0)
 		{
-			return;
-		}
-		for (int i = 0; i < 8; i++)
-		{
-			int x1 = z.x + d1king[i];
-			int x2 = z.y + d2king[i];
-			if (x1 >= 0 && x1 <m && x2 >= 0 && x2 < n && visitedking[x1][x2] == -1)
-			{
-				if (visitedhorse[x1][x2] == -1 && a[x1][x2] != 1)
-				{
-					visitedking[x1][x2] = visitedking[z.x][z.y] + 1;
-					push(x1,x2);
-				}
-			}
+			visited[j] = 1;
+			quaylui(j,total + dis[i][j],cnt+1);
+			visited[j] = 0;
 		}
 	}
 	return;
 }
 int main()
 {
-	//freopen("Text.txt","r",stdin);
+	freopen("Text.txt","r",stdin);
 	int t1;
 	cin>>t1;
 	for (int test = 1; test <= t1; test++)
 	{
-		front = 0;
-		rear = -1;
-		ans = -1;
-		cin>>m>>n;
-		for (int i = 0; i < m; i++)
+		ans = 1e9;
+		cin>>p>>q>>s>>t>>n;
+		nx[0] = p;
+		ny[0] = q;
+		for (int i = 1; i <= n; i++)
 		{
-			for (int j = 0; j < n; j++)
+			int x,y;
+			cin>>x>>y;
+			nx[i] = x;
+			ny[i] = y;
+		}
+		nx[n+1] = s;
+		ny[n+1] = t;
+		for (int i = 0; i <= n+1; i++)
+		{
+			visited[i] = 0;
+			for (int j = 0; j <= n+1; j++)
 			{
-				visitedhorse[i][j] = -1;
-				visitedking[i][j] = -1;
-				a[i][j] = 0;
-				char c;
-				cin>>c;
-				if (c == 'Z')
-				{
-					a[i][j] = 1;
-					visitedhorse[i][j] = 0;
-					push(i,j);
-				}
-				else if (c == 'A')
-				{
-					p = i;
-					q = j;
-				}
-				else if (c == 'B')
-				{
-					s = i;
-					t = j;
-				}
+				dis[i][j] = 0;
 			}
 		}
-		madi();
-		front = 0;
-		rear = -1;
-		push(p,q);
-		visitedking[p][q] = 0;
-		vuadi();
-		for (int i = 0; i < m; i++)
+		for (int i = 0; i <= n+1; i++)
 		{
-			for (int j = 0; j < n; j++)
+			for (int j = i + 1; j <= n+1; j++)
 			{
-				if (visitedhorse[i][j] == -1) cout<<"."<<" ";
-				else cout<<visitedhorse[i][j]<<" ";
+				dis[i][j] = abss(nx[j],nx[i]) + abss(ny[j],ny[i]);
+				dis[j][i] = dis[i][j];
 			}
-			cout<<endl;
 		}
-		cout<<visitedking[s][t]<<endl;
+		visited[0] = 1;
+		quaylui(0,0,0);
+		cout<<"Case #"<<test<<" "<<ans<<endl;
 	}
 	return 0;
 }
