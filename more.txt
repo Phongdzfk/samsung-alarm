@@ -1,11 +1,10 @@
 #include <iostream>
 using namespace std;
 int a[3005][3005] = {};
-int dis[3005][3005] = {};
-int visited[3005] = {};
-int n,p,q,s,t;
-int ny[3005] = {};
-int nx[3005] = {};
+int visited[3005][3005] = {};
+int n;
+int dx[4] = {0,0,1,-1};
+int dy[4] = {1,-1,0,0};
 int rear = -1;
 int front = 0;
 int ans;
@@ -33,64 +32,74 @@ bool empty()
 {
 	return front > rear;
 }
-void quaylui(int i,int total,int cnt)
+void quaylui(int x,int y, int hmax,int hmin)
 {
-	if (cnt == n)
+	if (x == n-1 && y == n-1)
 	{
-		if (dis[i][n+1] + total < ans) ans = dis[i][n+1] + total;
+		if (abss(hmax,hmin) < ans) ans = abss(hmax,hmin);
 		return;
 	}
-	if (total > ans) return;
-	for (int j = 1; j <= n; j++)
+	if (abss(hmax,hmin) > ans) return;
+	int check[200][200] = {};
+	int checkmin = 1e9;
+	for (int i = 0; i < 4; i++)
 	{
-		if (visited[j] == 0)
+		int x1 = x + dx[i];
+		int x2 = y + dy[i];
+		if (x1 <0 || x2 < 0|| x1 >= n || x2 >= n) continue;
+		if (visited[x1][x2] == 1) continue;
+		if (a[x1][x2] >= hmin  && a[x1][x2] <= hmax)
 		{
-			visited[j] = 1;
-			quaylui(j,total + dis[i][j],cnt+1);
-			visited[j] = 0;
+			check[x1][x2] = 0;
+		}
+		if (a[x1][x2] > hmax)
+		{
+			check[x1][x2] = a[x1][x2] - hmax;
+		}
+		if (a[x1][x2] < hmin)
+		{
+			check[x1][x2] = hmin - a[x1][x2];
+		}
+		if (check[x1][x2] < checkmin) checkmin = check[x1][x2];
+	}
+	for (int i = 0; i < 4; i++)
+	{
+		int x1 = x + dx[i];
+		int x2 = y + dy[i];
+		if (x1 <0 || x2 < 0|| x1 >= n || x2 >= n) continue;
+		if (visited[x1][x2] == 1) continue;
+		if (check[x1][x2] == checkmin)
+		{
+			visited[x1][x2] = 1;
+			quaylui(x1,x2,max(hmax,a[x1][x2]),min(hmin,a[x1][x2]));
+		}
+		if (check[x1][x2] != checkmin && x1 == n-1 && x2 == n-1)
+		{
+			visited[x1][x2] = 1;
+			quaylui(x1,x2,max(hmax,a[x1][x2]),min(hmin,a[x1][x2]));
 		}
 	}
 	return;
 }
 int main()
 {
-	freopen("Text.txt","r",stdin);
+	//freopen("Text.txt","r",stdin);
 	int t1;
 	cin>>t1;
 	for (int test = 1; test <= t1; test++)
 	{
+		cin>>n;
 		ans = 1e9;
-		cin>>p>>q>>s>>t>>n;
-		nx[0] = p;
-		ny[0] = q;
-		for (int i = 1; i <= n; i++)
+		for (int i = 0; i < n; i++)
 		{
-			int x,y;
-			cin>>x>>y;
-			nx[i] = x;
-			ny[i] = y;
-		}
-		nx[n+1] = s;
-		ny[n+1] = t;
-		for (int i = 0; i <= n+1; i++)
-		{
-			visited[i] = 0;
-			for (int j = 0; j <= n+1; j++)
+			for (int j = 0; j < n; j++)
 			{
-				dis[i][j] = 0;
+				cin>>a[i][j];
+				visited[i][j] = 0;
 			}
 		}
-		for (int i = 0; i <= n+1; i++)
-		{
-			for (int j = i + 1; j <= n+1; j++)
-			{
-				dis[i][j] = abss(nx[j],nx[i]) + abss(ny[j],ny[i]);
-				dis[j][i] = dis[i][j];
-			}
-		}
-		visited[0] = 1;
-		quaylui(0,0,0);
-		cout<<"Case #"<<test<<" "<<ans<<endl;
+		quaylui(0,0,a[0][0],a[0][0]);
+		cout<<"#"<<test<<" "<<ans<<endl;
 	}
 	return 0;
 }
