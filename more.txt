@@ -2,7 +2,6 @@
 using namespace std;
 long long a[105];
 long long visited[105];
-int kqua[105];
 long long n;
 long long ans;
 
@@ -16,6 +15,24 @@ int check = 0;
 
 void quaylui(long long i, long long total,long long cnt)
 {
+	if (i < n)
+	{
+		long long tmp = total;
+		long long m1 = 0,m2 = 0;
+		for (int j = 0; j < cnt; j++)
+		{
+			if (a[j] > m1)
+			{
+				m2 = m1;
+				m1 = a[j];
+			}
+			else if (a[j] > m2)
+			{
+				m2 = a[j];
+			}
+		}
+		if (tmp + (m1 * m2 * cnt-2) + m1 * 2 < ans) return;
+	}
 	if (i == n)
 	{
 		if (total > ans) ans = total;
@@ -40,7 +57,7 @@ void quaylui(long long i, long long total,long long cnt)
 			a[z] = a[z+1];
 		}
 		quaylui(i+1,tmp,cnt-1);
-		for (int z = j + 1; z < cnt; z++)
+		for (int z = cnt-1; z > j; z--)
 		{
 			a[z] = a[z-1];
 		}
@@ -58,7 +75,6 @@ int main()
 	cin>>t;
 	for (int test=1; test<=t; test++)
 	{
-		check = 1;
 		ans = 0;
 		cin>>n;
 		for (int i = 0; i < n; i++)
@@ -71,3 +87,5 @@ int main()
 	}
 	return 0;
 }
+
+
