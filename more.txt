@@ -1,25 +1,74 @@
 #include <iostream>
 using namespace std;
-long long a[30][30];
-int visited[30][30];
-long long n,m;
+long long a[20];
+int dx[4] = {0,0,-1,1};
+int dy[4] = {-1,1,0,0};
+int unique[500][120];
+int check[5005];
+long long visited[20];
+int ans;
+long long n,sum;
 
-int quaylui(int x, int cnt)
+struct point{ int x,y; };
+point q[9000005];
+int front_, rear_;
+void push(int x,int y){ rear_++; q[rear_].x=x; q[rear_].y=y; }
+point pop(){ return q[front_++]; }
+bool empty_(){ return front_ > rear_; }
+
+void quaylui(int x,int tong)
 {
-	int best_ = cnt;
-	for (int i = 0; i < n; i++)
+	if (x == n)
 	{
-		if (a[x][i] == 1 && visited[x][i] == 0)
+		if (tong == sum) 
 		{
-			visited[x][i] = 1;
-			visited[i][x] = 1;
-			int tmp = quaylui(i, cnt+1);
-			if (tmp > best_) best_ = tmp;
-			visited[x][i] = 0;
-			visited[i][x] = 0;
+			for (int i = 0; i < 101; i++)
+			{
+				check[i] = 0;
+			}
+			for (int z = 1; z <= ans; z++)
+			{
+				int kt = 0;
+				for (int i = 0; i < n; i ++)
+				{
+					if (visited[i] == 1)
+					{
+						check[a[i]]++;
+					}
+				}
+				for (int i = 0; i < n; i ++)
+				{
+					if (visited[i] == 1)
+					{
+						if (check[a[i]] != unique[ans][a[i]])
+						{
+							kt = 1;
+							break;
+						}
+					}
+				}
+				if (kt == 0) return;
+			}
+			ans++;
+			for (int i = 0; i < n; i ++)
+			{
+				if (visited[i] == 1)
+				{
+					unique[ans][a[i]]++;
+				}
+			}
+			cout<<endl;
 		}
+		return;
 	}
-	return best_;
+	if (tong > sum) return;
+	for (int i = 0; i <=1; i++)
+	{
+		int z = visited[x];
+		visited[x] = i;
+		quaylui(x+1,tong + a[x] * i);
+		visited[x] = z;
+	}
 }
 
 int main()
@@ -30,27 +79,22 @@ int main()
 	cin>>t;
 	for (int test=1; test<=t; test++)
 	{
-		int ans = 0;
-		cin>>n>>m;
+		ans = 0;
+		cin>>sum>>n;
 		for (int i = 0; i < n; i++)
-			for (int j = 0; j < n; j++)
+		{
+			cin>>a[i];
+		}
+		for (int i = 0; i < 5000; i++)
+		{
+			for (int j = 0; j < 105; j++)
 			{
-				a[i][j] = 0;
-				visited[i][j] = 0;
+				unique[i][j] = 0;
 			}
-		for (int i = 0; i <m; i++)
-		{
-			int x,y;
-			cin>>x>>y;
-			a[x][y] = 1;
-			a[y][x] = 1;
 		}
-		for (int i = 0; i < n; i++)
-		{
-			int res = quaylui(i,0);
-			if (res > ans) ans = res;
-		}
-		cout<<ans<<endl;
+		quaylui(0,0);
+		if (ans == 0) cout<<"#"<<test<<" "<<-1<<endl;
+		else cout<<"#"<<test<<" "<<ans<<endl;
 	}
 	return 0;
 }
