@@ -4,7 +4,7 @@ long long a[20];
 int dx[4] = {0,0,-1,1};
 int dy[4] = {-1,1,0,0};
 int unique[500][120];
-int check[5005];
+
 long long visited[20];
 int ans;
 long long n,sum;
@@ -22,42 +22,32 @@ void quaylui(int x,int tong)
 	{
 		if (tong == sum) 
 		{
-			for (int i = 0; i < 101; i++)
+			int check[105] = {};
+			for (int i = 0; i < n; i ++)
 			{
-				check[i] = 0;
+				if (visited[i] == 1)
+				{
+					check[a[i]]++;
+				}
 			}
 			for (int z = 1; z <= ans; z++)
 			{
 				int kt = 0;
-				for (int i = 0; i < n; i ++)
+				for (int i = 0; i < 105; i ++)
 				{
-					if (visited[i] == 1)
+					if (check[i] != unique[z][i])
 					{
-						check[a[i]]++;
-					}
-				}
-				for (int i = 0; i < n; i ++)
-				{
-					if (visited[i] == 1)
-					{
-						if (check[a[i]] != unique[ans][a[i]])
-						{
-							kt = 1;
-							break;
-						}
+						kt = 1;
+						break;
 					}
 				}
 				if (kt == 0) return;
 			}
 			ans++;
-			for (int i = 0; i < n; i ++)
+			for (int i = 0; i < 105; i ++)
 			{
-				if (visited[i] == 1)
-				{
-					unique[ans][a[i]]++;
-				}
+				unique[ans][i] = check[i];
 			}
-			cout<<endl;
 		}
 		return;
 	}
