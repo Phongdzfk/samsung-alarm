@@ -1,119 +1,33 @@
-Cho một số tự nhiên N ≤ 9. Giữa các số từ 1 đến N hãy thêm vào các dấu + và - sao cho kết quả thu được bằng 0. Hãy viết chương trình tìm tất cả các khả năng có thể.
-
-[Input]
-
-Dòng đầu tiên là T số testcase. T dòng tiếp theo là các số tự nhiên N <= 9.
-
- 
-
-[Output]
-
-Mỗi test case in ra “# ” theo sau là số lượng kết quả tìm được mỗi test case. 
-
-
-
-[Sample] 
-
-[Input]
-
-1
-
-7
-
- 
-
-[Output]
-
-#1 6
-
- 
-
-Giải thích
-
-1-2-3-4-5+6+7=0
-
-1-2+3+4-5+6-7=0
-
-1-23-45+67=0
-
-1-23+4+5+6+7=0
-
-1+2-3-4+5+6-7=0
-
-1+2-3+4-5-6+7=0
-
-
 #include <iostream>
 using namespace std;
-long long a[15][15];
-long long visited[15][15] = {};
-long long checked[15][15];
-long long m1;
-int dx[2][6] = {{0,-1,0,1,1,1},{-1,-1,-1,0,0,1}};
-int dy[2][6] = {{-1,0,1,1,0,-1},{-1,0,1,-1,1,0}};
-int ans;
 long long n;
+int ans;
 
-struct point{ int x,y; };
-point q[9000005];
-int front, rear;
-void push(int x,int y){ rear++; q[rear].x=x; q[rear].y=y; }
-point pop(){ return q[front++]; }
-bool empty(){ return front > rear; }
-
-void quaylui(int idx, int total,int acc,int check)
+// idx: chữ số bắt đầu toán hạng tiếp theo (1..n)
+// total: tổng biểu thức tính tới hiện tại
+void quaylui(int idx, long long total)
 {
 	if (idx == n + 1)
 	{
 		if (total == 0) ans++;
 		return;
 	}
-	for (int i = 0; i <= 2; i++)
+
+	// dựng 1 toán hạng bằng cách ghép các chữ số idx, idx+1, ..., j
+	long long operand = 0;
+	for (int j = idx; j <= n; j++)
 	{
-		if (i == 0)
+		operand = operand * 10 + j;   // ghép thêm chữ số j vào cuối toán hạng
+
+		if (idx == 1)
 		{
-			int tmp = total;
-			if (acc == idx) 
-			{
-				tmp += acc;
-			}
-			else if (acc != idx)
-			{
-				if (check == 1)
-				{
-					tmp = tmp - acc + idx;
-				}
-				else tmp = tmp + acc + idx;
-			}
-			quaylui(idx+1,tmp,idx+1,i);
+			// chữ số đầu tiên: không có dấu đứng trước -> luôn cộng
+			quaylui(j+1, total + operand);
 		}
-		else if (i == 1)
+		else
 		{
-			int tmp = total;
-			if (acc == idx) 
-			{
-				tmp += acc;
-			}
-			else if (acc != idx)
-			{
-				if (check == 1)
-				{
-					tmp = tmp - acc - idx;
-				}
-				else tmp = tmp + acc - idx;
-			}
-			quaylui(idx+1,tmp,idx+1,i);
-		}
-		else if (i == 2)
-		{
-			if (acc == idx)
-			{
-				quaylui(idx+1,total,(acc-1) * 10 + acc,check);
-			}
-			else
-			{
-				quaylui(idx+1,total,(acc * 10) + idx,check);
-			}
+			quaylui(j+1, total + operand);   // đặt dấu +
+			quaylui(j+1, total - operand);   // đặt dấu -
 		}
 	}
 }
@@ -122,14 +36,13 @@ int main()
 {
 	ios_base::sync_with_stdio(false);
 	cin.tie(NULL);
-	//freopen("Text.txt","r",stdin);
 	int t;
 	cin>>t;
 	for (int test=1; test<=t; test++)
 	{
 		ans = 0;
 		cin>>n;
-		quaylui(2,1,2,1);
+		quaylui(1, 0);
 		cout<<"#"<<test<<" "<<ans<<endl;
 	}
 	return 0;
