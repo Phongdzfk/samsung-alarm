@@ -1,135 +1,128 @@
-The newly developed mobile processor Maxinos from Samsung has N x N number of cells.
-
-
-
- ...
-
-
-In 1 cell there can be 1 core or 1 electric wire.
-
-
-
- 
-
-
-Electric power runs on the edge of Maxinos.
-
-
-
-
- 
-
- 
-
-The wire that connects the core and the power can only be installed in a straight line.
-
-
-
- 
-
-
-Wires cannot intersect with each other.
-
-
-
-
-The initial Maxinos’ condition before the wires are connected is given as below.
-
- 
-
-(The Cores on the margin of Maxinos are considered to be already connected to the power.)
-
-
-
-
-
-
-
- 
-
- 
-
-
-
- 
-
- 
-
-▶ When the maximum number of Cores is connected to the power, find the sum length of the wire.
-
- 
-
-   However, if there are many different options find the minimum value of the sum of the length of the wire.
-
- 
-
- 
-
-
-The answer for the exercise above is 12.
-
- 
-
- 
-
- 
-
-[Restrictions]
-
-
-
-
-1. 7 ≤ N ≤ 12
-
-
-
-
-2. The number of Core is more or equal than 1 and less than or equal to 12(1 ≤  N ≤ 12).
-
-
-
-
-3. There may be Cores that does not get connected to the power, even though one may try to connect it to the power as much as possible.
-
- 
-
- 
-
-[Input]
-
-
-
-
-The first line contains T, the number of test cases.
-
-
-
-
-The test cases are given starting on the next line.
-
-
-
-
-The first line of each test case has N, and in the next N number of lines the Maxinos’ initial condition, given in N x N array.
-
-
-
-
-0 denotes an empty cell, and 1 denotes the Core, and there are no other numbers given.
-
- 
-
- 
-
-
-[Output]
-
-
-
-
-Print ‘#tc’ for each test case, and leave a blank space and print the answer.
-
-
-
-
-(tc refers to a test case number and it starts with 1)
+#include <iostream>
+using namespace std;
+long long n;
+int a[15][15];
+int visited[15][15];
+int dx[8] = {0,0,1,-1,1,1,-1,-1};
+int dy[8] = {1,-1,0,0,1,-1,1,-1};
+int ans;
+int maxcnt;
+void quaylui(long long total,int cnt)
+{
+	int find = 0;
+	for (int i = 0; i < n; i++)
+	{
+		for (int j = 0; j < n; j++)
+		{
+			if (a[i][j] == 1 && visited[i][j] == 0)
+			{
+				if (i == 0 || i == n-1 || j == 0 || j == n-1)
+				{
+					visited[i][j] = 1;
+					continue;
+				}
+				find = 1;
+				visited[i][j] = 1;
+				int huong1,huong2,huong3,huong4;
+				huong1 = i+1;
+				huong2 = i-1;
+				huong3 = j+1;
+				huong4 = j-1;
+				while (huong1 < n && visited[huong1][j] == 0 && a[huong1][j] == 0) huong1++;
+				while (huong2 >= 0 && visited[huong2][j] == 0 && a[huong2][j] == 0) huong2--;
+				while (huong3 < n && visited[i][huong3] == 0 && a[i][huong3] == 0) huong3++;
+				while (huong4 >= 0 && visited[i][huong4] == 0 && a[i][huong4] == 0) huong4--;
+				quaylui(total,cnt);
+				if (huong1 == n)
+				{
+					for (int z = i + 1; z < huong1; z++)
+					{
+						visited[z][j] = 1;
+					}
+					quaylui(total + (huong1 - i - 1),cnt+1);
+					for (int z = i + 1; z < huong1; z++)
+					{
+						visited[z][j] = 0;
+					}
+				}
+				if (huong2 == -1)
+				{
+					for (int z = i - 1; z > huong2; z--)
+					{
+						visited[z][j] = 1;
+					}
+					quaylui(total + i,cnt+1);
+					for (int z = i - 1; z > huong2; z--)
+					{
+						visited[z][j] = 0;
+					}
+				}
+				if (huong3 == n)
+				{
+					for (int z = j + 1; z < huong3; z++)
+					{
+						visited[i][z] = 1;
+					}
+					quaylui(total + (huong3 - j - 1),cnt+1);
+					for (int z = j + 1; z < huong3; z++)
+					{
+						visited[i][z] = 0;
+					}
+				}
+				if (huong4 == -1)
+				{
+					for (int z = j - 1; z > huong4; z--)
+					{
+						visited[i][z] = 1;
+					}
+					quaylui(total + j,cnt+1);
+					for (int z = j - 1; z > huong4; z--)
+					{
+						visited[i][z] = 0;
+					}
+				}
+				break;
+			}
+		}
+		if (find == 1) break;
+	}
+	if (find == 0)
+	{
+		if (cnt > maxcnt) 
+		{
+			maxcnt = cnt;
+			ans = total;
+			return;
+		}
+		if (cnt == maxcnt && total < ans)
+		{
+			ans = total;
+			return;
+		}
+	}
+}
+
+int main()
+{
+	ios_base::sync_with_stdio(false);
+	cin.tie(NULL);
+	int t;
+	cin>>t;
+	for (int test=1; test<=t; test++)
+	{
+		ans = 1e9;
+		maxcnt = 0;
+		cin>>n;
+		for (int i = 0; i < n; i++)
+		{
+			for (int j = 0; j < n; j++)
+			{
+				cin>>a[i][j];
+				visited[i][j] = 0;
+			}
+		}
+		quaylui(0,0);
+		cout<<"#"<<test<<" "<<ans<<endl;
+	}
+	return 0;
+}
