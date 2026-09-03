@@ -2,7 +2,7 @@ The newly developed mobile processor Maxinos from Samsung has N x N number of ce
 
 
 
- 
+ ...
 
 
 In 1 cell there can be 1 core or 1 electric wire.
