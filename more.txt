@@ -1,67 +1,129 @@
-3             // The number of test case, T = 3
+#include <iostream>
+using namespace std;
+long long n;
+int a[15][15];
+int visited[15][15];
+int dx[8] = {0,0,1,-1,1,1,-1,-1};
+int dy[8] = {1,-1,0,0,1,-1,1,-1};
+int ans;
+int maxcnt;
+void quaylui(long long total,int cnt)
+{
+	int find = 0;
+	for (int i = 0; i < n; i++)
+	{
+		for (int j = 0; j < n; j++)
+		{
+			if (a[i][j] == 1 && visited[i][j] == 0)
+			{
+				if (i == 0 || i == n-1 || j == 0 || j == n-1)
+				{
+					visited[i][j] = 1;
+					continue;
+				}
+				find = 1;
+				visited[i][j] = 1;
+				int huong1,huong2,huong3,huong4;
+				huong1 = i+1;
+				huong2 = i-1;
+				huong3 = j+1;
+				huong4 = j-1;
+				while (huong1 < n && visited[huong1][j] == 0 && a[huong1][j] == 0) huong1++;
+				while (huong2 >= 0 && visited[huong2][j] == 0 && a[huong2][j] == 0) huong2--;
+				while (huong3 < n && visited[i][huong3] == 0 && a[i][huong3] == 0) huong3++;
+				while (huong4 >= 0 && visited[i][huong4] == 0 && a[i][huong4] == 0) huong4--;
+				quaylui(total,cnt);
+				if (huong1 == n)
+				{
+					for (int z = i + 1; z < huong1; z++)
+					{
+						visited[z][j] = 1;
+					}
+					quaylui(total + (huong1 - i - 1),cnt+1);
+					for (int z = i + 1; z < huong1; z++)
+					{
+						visited[z][j] = 0;
+					}
+				}
+				if (huong2 == -1)
+				{
+					for (int z = i - 1; z > huong2; z--)
+					{
+						visited[z][j] = 1;
+					}
+					quaylui(total + i,cnt+1);
+					for (int z = i - 1; z > huong2; z--)
+					{
+						visited[z][j] = 0;
+					}
+				}
+				if (huong3 == n)
+				{
+					for (int z = j + 1; z < huong3; z++)
+					{
+						visited[i][z] = 1;
+					}
+					quaylui(total + (huong3 - j - 1),cnt+1);
+					for (int z = j + 1; z < huong3; z++)
+					{
+						visited[i][z] = 0;
+					}
+				}
+				if (huong4 == -1)
+				{
+					for (int z = j - 1; z > huong4; z--)
+					{
+						visited[i][z] = 1;
+					}
+					quaylui(total + j,cnt+1);
+					for (int z = j - 1; z > huong4; z--)
+					{
+						visited[i][z] = 0;
+					}
+				}
+				visited[i][j] = 0;
+				break;
+			}
+		}
+		if (find == 1) break;
+	}
+	if (find == 0)
+	{
+		if (cnt > maxcnt) 
+		{
+			maxcnt = cnt;
+			ans = total;
+			return;
+		}
+		if (cnt == maxcnt && total < ans)
+		{
+			ans = total;
+			return;
+		}
+	}
+}
 
-7         // TC 1, N = 7
-
-0 0 1 0 0 0 0
-
-0 0 1 0 0 0 0
-
-0 0 0 0 0 1 0
-
-0 0 0 0 0 0 0
-
-1 1 0 1 0 0 0
-
-0 1 0 0 0 0 0
-
-0 0 0 0 0 0 0
-
-9         // TC 2, N = 9
-
-0 0 0 0 0 0 0 0 0
-
-0 0 1 0 0 0 0 0 1
-
-1 0 0 0 0 0 0 0 0
-
-0 0 0 1 0 0 0 0 0
-
-0 1 0 0 0 0 0 0 0
-
-0 0 0 0 0 0 1 0 0
-
-0 0 0 1 0 0 0 0 0
-
-0 0 0 0 0 0 0 1 0
-
-0 0 0 0 0 0 0 0 1
-
-11             // TC 3, N = 11
-
-0 0 1 0 0 0 0 0 0 0 0
-
-0 0 0 0 0 0 0 0 0 0 0
-
-0 0 0 0 0 0 0 0 0 0 1
-
-0 0 0 1 0 0 0 0 1 0 0
-
-0 1 0 1 1 0 0 0 1 0 0
-
-0 0 0 0 0 0 0 0 0 0 0
-
-0 0 0 0 0 0 0 1 0 0 0
-
-0 0 0 0 0 0 0 0 0 0 0
-
-0 0 0 0 0 0 0 0 1 0 0
-
-0 0 0 0 0 0 1 0 0 0 0
-
-0 0 0 0 0 0 0 0 0 0 0
-
-#1 12           //1st TC’s Output
-
-#2 10           //2nd TC’s Output
-
-#3 24           //3rd TC’s Output
+int main()
+{
+	ios_base::sync_with_stdio(false);
+	cin.tie(NULL);
+	int t;
+	cin>>t;
+	for (int test=1; test<=t; test++)
+	{
+		ans = 1e9;
+		maxcnt = 0;
+		cin>>n;
+		for (int i = 0; i < n; i++)
+		{
+			for (int j = 0; j < n; j++)
+			{
+				cin>>a[i][j];
+				visited[i][j] = 0;
+			}
+		}
+		quaylui(0,0);
+		cout<<"#"<<test<<" "<<ans<<endl;
+	}
+	return 0;
+}
