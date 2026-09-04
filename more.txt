@@ -1,24 +1,82 @@
 #include <iostream>
 using namespace std;
-long long m,d;
-int mana[6];
-int tt[6];
-int x[25];
+int n;
+int num[25];
+int cost[25];
+int fatig[25];
+int choose[25];
 int dx[8] = {0,0,1,-1,1,1,-1,-1};
 int dy[8] = {1,-1,0,0,1,-1,1,-1};
 int ans;
 int maxcnt;
-void quaylui(int loai,int energy,int thoigian,int km)
+void quaylui(int cong,int total, int binhsi)
 {
-	if (energy < 0) return;
-	if (loai == 5)
+	if (cong == n+1)
 	{
-		if (thoigian < ans) ans = thoigian;
+		if (total < ans) ans = total;
 		return;
 	}
-	for (int i = km; i <= d; i++)
+	if (total > ans) return;
+	//pass
+	quaylui(cong+1,total + cost[cong],binhsi);
+	//hire
+	choose[cong] = num[cong];
+	fatig[cong] = 3;
+	quaylui(cong+1,total + cost[cong]*2,binhsi + num[cong]);
+	choose[cong] = 0;
+	fatig[cong] = 0;
+	//battle
+	int opp = num[cong];
+	for (int i = 1; i <= n; i++)
 	{
-		quaylui(loai+1,energy-(mana[loai] * (i-km)),thoigian+(tt[loai] * (i-km)),i + 1);
+		if (choose[i] != 0 && fatig[i] == 0) binhsi-=num[i];
+	}
+	int tmp = binhsi;
+	int tmp1 = opp;
+	if (binhsi >= opp)
+	{
+		tmp -= opp;
+		for (int i = 1; i <= n; i++)
+		{
+			if (choose[i] != 0)
+			{
+				fatig[i]-=1;
+				if (opp > 0)
+				{
+					if (opp > choose[i])
+					{
+						choose[i] = 0;
+						opp-=choose[i];
+					}
+					else
+					{
+						choose[i] = choose[i] - opp;
+						opp = 0;
+					}
+				}
+			}
+			quaylui(cong+1,total,tmp);
+			for (int i = 1; i <= n; i++)
+			{
+				if (choose[i] != 0)
+				{
+					fatig[i]+=1;
+					if (tmp1 > 0)
+					{
+						if (tmp1 > choose[i])
+						{
+							choose[i] = num[i];
+							tmp-=choose[i];
+						}
+						else
+						{
+							choose[i] = choose[i] + tmp;
+							tmp = 0;
+						}
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -31,24 +89,13 @@ int main()
 	cin>>t;
 	for (int test=1; test<=t; test++)
 	{
-		ans = 1e9;
-		cin>>m>>d;
-		for (int i = 1; i <= 5; i++)
+		cin>>n;
+		for (int i = 1; i <=n; i++)
 		{
-			int p,s;
-			cin>>p>>s;
-			int tmp = p*60 + s;
-			tt[i] = tmp;
-			cin>>mana[i];
+			cin>>num[i]>>cost[i];
+			choose[i] = 0;
 		}
-		quaylui(1,m,0,1);
-		if (ans == 1e9) cout<<"Case #"<<test<<endl<<-1<<endl;
-		else
-		{
-			int phut = ans/60;
-			int giay = ans%60;
-			cout<<"Case #"<<test<<endl<<phut<<" "<<giay<<endl;
-		}
+		quaylui(1,0,0);
 	}
 	return 0;
 }
