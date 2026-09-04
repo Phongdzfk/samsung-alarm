@@ -1,87 +1,63 @@
-//day la ban moi
 #include <iostream>
-
 using namespace std;
 int n;
 int num[25];
 int cost[25];
-int fatig[25];
 int choose[25];
-int dx[8] = {0,0,1,-1,1,1,-1,-1};
-int dy[8] = {1,-1,0,0,1,-1,1,-1};
+int fatig[25];
 int ans;
-int maxcnt;
-void quaylui(int cong,int total, int binhsi)
+
+void quaylui(int cong, int total, int binhsi)
 {
+	if (total >= ans) return;
 	if (cong == n+1)
 	{
 		if (total < ans) ans = total;
 		return;
 	}
-	if (total > ans) return;
-	//pass
-	quaylui(cong+1,total + cost[cong],binhsi);
-	//hire
+
+	quaylui(cong+1, total + cost[cong], binhsi);
+
 	choose[cong] = num[cong];
 	fatig[cong] = 3;
-	quaylui(cong+1,total + cost[cong]*2,binhsi + num[cong]);
+	quaylui(cong+1, total + cost[cong]*2, binhsi + num[cong]);
 	choose[cong] = 0;
 	fatig[cong] = 0;
-	//battle
-	int opp = num[cong];
-	for (int i = 1; i <= n; i++)
+
+	if (binhsi >= num[cong])
 	{
-		if (choose[i] != 0 && fatig[i] == 0) 
-		{
-			choose[i] = 0;
-			binhsi-=num[i];
-		}
-	}
-	int tmp = binhsi;
-	int tmp1 = opp;
-	if (binhsi >= opp)
-	{
-		tmp -= opp;
+		int opp = num[cong];
+		int saveChoose[25];
+		int saveFatig[25];
 		for (int i = 1; i <= n; i++)
 		{
-			if (choose[i] != 0)
+			saveChoose[i] = choose[i];
+			saveFatig[i] = fatig[i];
+		}
+
+		int kill = opp;
+		for (int i = 1; i <= n && kill > 0; i++)
+		{
+			if (choose[i] > 0)
 			{
-				fatig[i]-=1;
-				if (opp > 0)
-				{
-					if (opp > choose[i])
-					{
-						choose[i] = 0;
-						opp-=choose[i];
-					}
-					else
-					{
-						choose[i] = choose[i] - opp;
-						opp = 0;
-					}
-				}
+				if (choose[i] <= kill) { kill -= choose[i]; choose[i] = 0; }
+				else { choose[i] -= kill; kill = 0; }
 			}
-			quaylui(cong+1,total,tmp);
-			for (int i = 1; i <= n; i++)
+		}
+
+		for (int i = 1; i <= n; i++)
+			if (choose[i] > 0)
 			{
-				if (choose[i] != 0)
-				{
-					fatig[i]+=1;
-					if (tmp1 > 0)
-					{
-						if (tmp1 > choose[i])
-						{
-							choose[i] = num[i];
-							tmp-=choose[i];
-						}
-						else
-						{
-							choose[i] = choose[i] + tmp;
-							tmp = 0;
-						}
-					}
-				}
+				fatig[i] -= 1;
+				if (fatig[i] == 0) choose[i] = 0;
 			}
+
+		quaylui(cong+1, total, binhsi - opp);
+
+		for (int i = 1; i <= n; i++)
+		{
+			choose[i] = saveChoose[i];
+			fatig[i] = saveFatig[i];
 		}
 	}
 }
@@ -90,19 +66,19 @@ int main()
 {
 	ios_base::sync_with_stdio(false);
 	cin.tie(NULL);
-	//freopen("Text.txt","r",stdin);
 	int t;
 	cin>>t;
 	for (int test=1; test<=t; test++)
 	{
-		cin>>n;
 		ans = 1e9;
-		for (int i = 1; i <=n; i++)
+		cin>>n;
+		for (int i = 1; i <= n; i++)
 		{
 			cin>>num[i]>>cost[i];
 			choose[i] = 0;
+			fatig[i] = 0;
 		}
-		quaylui(1,0,0);
+		quaylui(1, 0, 0);
 		cout<<"#"<<test<<" "<<ans<<endl;
 	}
 	return 0;
