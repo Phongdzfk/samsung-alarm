@@ -1,113 +1,27 @@
-Hugo thi chạy
-
-Sắp tới công ty nên Hugo làm việc tổ chức sự kiện Olympic dành cho toàn bộ nhân viên. Có rất nhiều bộ môn thi đấu như Bóng bàn, cầu long, cờ vua, cờ tướng, bơi lội, và có cả thể thao điện tử nữa. Là một người quan tâm tới sức khỏe của bản thân vì vậy Hugo thường xuyên chạy bộ để rèn luyện sức khỏe. Thật may trong các môn thi đấu Olympic có hạng mục này. Trong quá trình tập luyện Hugo đã luyện cho mình được 5 kiểu chạy khác nhau, mỗi kiểu chạy sẽ tiêu tốn số lượng năng lượng nhất định và thời gian chạy hết 1km là khác nhau. Mỗi kiểu chạy sẽ sử dụng cho 1km.
-
-Năng lượng của Hugo là có hạn, nếu sử dụng vượt Hugo sẽ bị bệnh.
-
-
-Sau khi tham khảo thông tin Hugo biết được quãng đường cần chạy bộ D của cuộc thi. Nhân viên y tế có thể giúp Hugo tính toán được số năng lượng tối đa của Hugo.
-Cho thông tin của 5 kiểu chạy của Hugo bao gồm số phút, số giây (số phút <= 6 và số giây <= 60) và số năng lượng tiêu tốn.
-Hãy tính thời gian ngắn nhất để Hugo về đích mà không bị bệnh.
-
- 
-
-Input
-
-Dòng đầu số test T (T<=50)
-
-Mỗi test bao gồm 2 dòng
-
-Dòng 1 chứa số năng lượng tối đa M <=60 và chiều dài quãng đường D<=40km
-Dòng thứ 2 chứa thông tin của 5 kiểu chạy lần lượt là số phút, số giây, số năng lượng tiêu tốn
-
- 
-
-Output
-In ra thời gian ngắn nhất để Hugo về đích mà không bị bệnh theo dạng số phút, số giây. Nếu không thể hãy in ra -1
-
- 
-
-Input
-
-4
-
-297 10
-
-5 38 23 5 22 12 4 16 6 5 38 20 0 20 17
-
-192 10
-
-2 6 12 6 5 24 2 22 22 4 13 12 4 30 16
-
-503 10
-
-1 42 20 1 8 14 0 33 15 2 6 6 5 3 16
-
-122 10
-
-2 37 21 3 59 22 6 0 22 4 56 5 0 9 10
-
- 
-
-Output
-
-Case #1
-
-3 20
-
-Case #2
-
-21 0
-
-Case #3
-
-5 30
-
-Case #4
-
-1 30
-
-
-
 #include <iostream>
 using namespace std;
-long long m,d,maxen;
+long long m,d;
 int mana[6];
-int minm;
 int tt[6];
+int x[25];
 int dx[8] = {0,0,1,-1,1,1,-1,-1};
 int dy[8] = {1,-1,0,0,1,-1,1,-1};
 int ans;
 int maxcnt;
-void quaylui(int duong,int energy,int thoigian,int bu,int truoc)
+void quaylui(int loai,int energy,int thoigian,int km)
 {
 	if (energy < 0) return;
-	if (duong == 0)
+	if (loai == 5)
 	{
 		if (thoigian < ans) ans = thoigian;
 		return;
 	}
-	for (int i = 1; i <= 5; i++)
+	for (int i = km; i <= d; i++)
 	{
-		if ((-mana[i] + maxen + bu) > 0)
-		{
-			quaylui(duong-1,energy-mana[i],thoigian+tt[i],maxen - mana[i] + bu,0);
-			break;
-		}
-		else if ((-mana[i] + maxen + bu) < 0  && truoc == 0)
-		{
-			quaylui(duong-1,energy-mana[i],thoigian+tt[i],maxen - mana[i] + bu,1);
-			break;
-		}
+		quaylui(loai+1,energy-(mana[loai] * (i-km)),thoigian+(tt[loai] * (i-km)),i + 1);
 	}
 }
-void swap (int &a, int &b)
-{
-	int tmp = a;
-	a = b;
-	b = tmp;
-	return;
-}
+
 int main()
 {
 	ios_base::sync_with_stdio(false);
@@ -118,9 +32,7 @@ int main()
 	for (int test=1; test<=t; test++)
 	{
 		ans = 1e9;
-		minm = 1e9;
 		cin>>m>>d;
-		maxen = m/d;
 		for (int i = 1; i <= 5; i++)
 		{
 			int p,s;
@@ -129,18 +41,7 @@ int main()
 			tt[i] = tmp;
 			cin>>mana[i];
 		}
-		for (int i = 1; i <= 5; i++)
-		{
-			for(int j = 1; j <=5-i; j++)
-			{
-				if (tt[j] > tt[j+1])
-				{
-					swap(mana[j],mana[j+1]);
-					swap(tt[j],tt[j+1]);
-				}
-			}
-		}
-		quaylui(d,m,0,0,0);
+		quaylui(1,m,0,1);
 		if (ans == 1e9) cout<<"Case #"<<test<<endl<<-1<<endl;
 		else
 		{
