@@ -1,4 +1,4 @@
-.
+//day la ban moi
 #include <iostream>
 
 using namespace std;
