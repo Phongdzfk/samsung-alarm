@@ -1,85 +1,141 @@
 #include <iostream>
 using namespace std;
-int n;
-int num[25];
-int cost[25];
-int choose[25];
-int fatig[25];
-int ans;
-
-void quaylui(int cong, int total, int binhsi)
+int n,e,k,t;
+double ans1;
+int ans2;
+double a[105][105];
+int front = 0;
+int rear = -1;
+int visited[105];
+double xacsuat[105][1025];
+struct point
 {
-	if (total >= ans) return;
-	if (cong == n+1)
+	int a;
+	int b;
+};
+int q[1000005];
+void push(int x)
+{
+	q[++rear] = x;
+}
+int pop()
+{
+	return q[front++];
+}
+bool empty()
+{
+	return front > rear;
+}
+void bfs()
+{
+	while(!empty())
 	{
-		if (total < ans) ans = total;
-		return;
-	}
-
-	quaylui(cong+1, total + cost[cong], binhsi);
-
-	choose[cong] = num[cong];
-	fatig[cong] = 3;
-	quaylui(cong+1, total + cost[cong]*2, binhsi + num[cong]);
-	choose[cong] = 0;
-	fatig[cong] = 0;
-
-	if (binhsi >= num[cong])
-	{
-		int opp = num[cong];
-		int saveChoose[25];
-		int saveFatig[25];
-		for (int i = 1; i <= n; i++)
+		int sr = pop();
+		if (t >= visited[sr] - 10 && t < visited[sr])
 		{
-			saveChoose[i] = choose[i];
-			saveFatig[i] = fatig[i];
-		}
-
-		int kill = opp;
-		for (int i = 1; i <= n && kill > 0; i++)
-		{
-			if (choose[i] > 0)
+			if (ans1 < xacsuat[sr][t])
 			{
-				if (choose[i] <= kill) { kill -= choose[i]; choose[i] = 0; }
-				else { choose[i] -= kill; kill = 0; }
+				ans1 = xacsuat[sr][t];
+				ans2 = sr;
 			}
+			continue;
 		}
-
-		for (int i = 1; i <= n; i++)
-			if (choose[i] > 0)
-			{
-				fatig[i] -= 1;
-				if (fatig[i] == 0) choose[i] = 0;
-			}
-
-		quaylui(cong+1, total, binhsi - opp);
-
+		if (t < visited[sr] - 10) continue;
 		for (int i = 1; i <= n; i++)
 		{
-			choose[i] = saveChoose[i];
-			fatig[i] = saveFatig[i];
+			if (a[sr][i] != -1)
+			{
+				visited[i] = visited[sr] + 10;
+				push(i);
+				if (xacsuat[i][visited[i]-1] == 0)
+				{
+					double tmp = xacsuat[sr][visited[i] - 11] * a[sr][i];
+					for (int z = visited[i] - 10; z < visited[i]; z++)
+					{
+						xacsuat[i][z] = tmp;
+					}
+				}
+				else if (xacsuat[i][visited[i]-1] != 0)
+				{
+					double tmp = xacsuat[i][visited[i]-1] + (xacsuat[sr][visited[i]-11] * a[sr][i]);
+					for (int z = visited[i] - 10; z < visited[i]; z++)
+					{
+						xacsuat[i][z] = tmp;
+					}
+				}
+			}
 		}
 	}
 }
-
 int main()
 {
 	ios_base::sync_with_stdio(false);
 	cin.tie(NULL);
-	int t;
-	cin>>t;
-	for (int test=1; test<=t; test++)
+	for (int test=1; test<=10; test++)
 	{
-		ans = 1e9;
+		cin>>n>>e>>k>>t;
 		cin>>n;
+		front = 0;
+		rear = -1;
+		for (int i = 1; i <=n ;i++)
+		{
+			loop[i] = -1;
+			visited[i] = -1;
+			for (int j = 1; j <= n; j++)
+			{
+				a[i][j] = -1;
+			}
+		}
 		for (int i = 1; i <= n; i++)
 		{
-			cin>>num[i]>>cost[i];
-			choose[i] = 0;
-			fatig[i] = 0;
+			for (int j = 0; j <= t + 15; j++)
+			{
+				xacsuat[i][j] = 0;
+			}
 		}
-		quaylui(1, 0, 0);
-		cout<<"#"<<test<<" "<<ans<<endl;
+		for (int i = 1; i <= e; i++)
+		{
+			int source, des, value;
+			cin>>source>>des>>value;
+			a[source][des] = value;
+		}
+		push(1);
+		visited[1] = 10;
+		for (int i = 0; i < 10; i++)
+		{
+			xacsuat[1][i] = 1.0;
+		}
+		ans1 = 0.0;
+		ans2 = -1;
+		bfs();
+		cout.precision(6);
+		cout<<"#"<<test<<" "<<ans2 - 1<<" ";
+		cout<<fixed<<ans1<<" ";
+		front = 0;
+		rear = -1;
+		for (int i = 1; i <=n ;i++)
+		{
+			visited[i] = -1;
+		}
+		for (int i = 1; i <= n; i++)
+		{
+			for (int j = 0; j <= t + 15; j++)
+			{
+				xacsuat[i][j] = 0;
+			}
+		}
+		push(1);
+		visited[1] = 10 + k;
+		for (int i = k; i < 10 + k; i++)
+		{
+			xacsuat[1][i] = 1.0;
+		}
+		ans1 = -1;
+		ans2 = -1;
+		bfs();
+		cout.precision(6);
+		cout<<ans2 -1<<" ";
+		cout<<fixed<<ans1<<endl;
 	}
 	return 0;
 }
