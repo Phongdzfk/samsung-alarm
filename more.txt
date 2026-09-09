@@ -8,28 +8,6 @@ int ans;
 int vitricua[5];
 int chongoi[100];
 int visited[5];
-int dx[4] = {0,0,1,-1};
-int dy[4] = {1,-1,0,0};
-struct point
-{
-	int a;
-	int b;
-};
-point q[1000005];
-void push(int x, int y)
-{
-	rear++;
-	q[rear].a = x;
-	q[rear].b = y;
-}
-point pop()
-{
-	return q[front++];
-}
-bool empty()
-{
-	return front > rear;
-}
 int khachlen(int x, int pri)
 {
 	int cnt = 0;
@@ -174,5 +152,138 @@ int main()
 		quaylui(1,0,0);
 		cout<<"Case #"<<test<<endl<<ans<<endl;
 	}
+
+
+
+VISIT
+
+#include <iostream>
+using namespace std;
+int n,e,k,t;
+float ans1;
+int ans2;
+float a[105][105];
+int front_ = 0;
+int rear_ = -1;
+float xacsuat[105][1105];
+bool visited[105][1105];
+
+struct point
+{
+	int node;
+	int time;
+};
+point q[300005];
+void push(int x,int tm)
+{
+	rear_++;
+	q[rear_].node = x;
+	q[rear_].time = tm;
+}
+point pop()
+{
+	return q[front_++];
+}
+bool empty_()
+{
+	return front_ > rear_;
+}
+
+void bfs(int start,int startTime)
+{
+	front_ = 0; rear_ = -1;
+	xacsuat[start][startTime] = 1.0;
+	push(start,startTime);
+	visited[start][startTime] = true;
+
+	while(!empty_())
+	{
+		point z = pop();
+		int sr = z.node;
+		int tm = z.time;
+		if (tm > t) continue;
+
+		for (int i = 1; i <= n; i++)
+		{
+			if (a[sr][i] != -1)
+			{
+				int nt = tm + 10;
+				xacsuat[i][nt] += xacsuat[sr][tm] * a[sr][i];
+				if (!visited[i][nt])
+				{
+					visited[i][nt] = true;
+					push(i,nt);
+				}
+			}
+		}
+	}
+}
+
+int main()
+{
+	ios_base::sync_with_stdio(false);
+	cin.tie(NULL);
+	//freopen("Text.txt","r",stdin);
+	for (int test=1; test<=10; test++)
+	{
+		if(!(cin>>n>>e>>k>>t)) break;
+		for (int i = 1; i <= n; i++)
+		{
+			for (int j = 1; j <= n; j++)
+			{
+				a[i][j] = -1;
+			}
+		}
+		for (int i = 1; i <= e; i++)
+		{
+			int source,des; float value;
+			cin>>source>>des>>value;
+			a[source][des] = value;
+		}
+
+		for (int i = 1; i <= n; i++)
+		{
+			for (int j = 0; j <= t+15; j++)
+			{ 
+				xacsuat[i][j] = 0; visited[i][j] = false; 
+			}
+		}
+		bfs(1,0);
+		ans1 = 0.0; ans2 = 0;
+		int moc = (t/10)*10;
+		for (int i = 1; i <= n; i++)
+		{
+			if (xacsuat[i][moc] > ans1 + 1e-12)
+			{ 
+				ans1 = xacsuat[i][moc]; ans2 = i; 
+			}
+		}
+		if (ans2 == 0) ans1 = 0.0;
+		cout.precision(6);
+		cout<<"#"<<test<<" "<<ans2<<" "<<fixed<<ans1<<" ";
+
+		for (int i = 1; i <= n; i++)
+		{
+			for (int j = 0; j <= t+15; j++)
+			{ 
+				xacsuat[i][j] = 0; visited[i][j] = false; 
+			}
+		}
+		bfs(1,k);
+		ans1 = 0.0; ans2 = 0;
+		int moc2 = k + ((t-k)/10)*10;
+		for (int i = 1; i <= n; i++)
+		{
+			if (xacsuat[i][moc2] > ans1 + 1e-12)
+			{ 
+				ans1 = xacsuat[i][moc2]; ans2 = i; 
+			}
+		}
+		if (ans2 == 0) ans1 = 0.0;
+		cout.precision(6);
+		cout<<ans2<<" "<<fixed<<ans1<<endl;
+	}
+	return 0;
+}
 	return 0;
 }
